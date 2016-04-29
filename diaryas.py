@@ -88,9 +88,7 @@ if __name__ == "__main__":
             pf.close()
         diary_changed = not(checksum(diary_checksums))
         #calculate required dates, use cache if possible
-        delta = datetime.timedelta()
-        if args.start_tomorrow: delta = datetime.timedelta(days=1)
-        startdate = datetime.date.today() + delta
+        startdate = datetime.date.today()
         if args.out_format in ("htmlyearplan", "pdfyearplan", "pdfcardyearplan"):
             startdate = startdate.replace(day=1)
             enddate = startdate.replace(year=startdate.year + 1) - datetime.timedelta(days=1)
@@ -99,6 +97,7 @@ if __name__ == "__main__":
         if (diary == [ ] or diary_changed or (startdate < diary[0][0]) or (enddate > diary[-1][0])):
             diary = get_diary(startdate, enddate)
         if args.out_format == "html":
+            if args.start_tomorrow: startdate += datetime.timedelta(days=1)
             print(build_html.build_html(diary, startdate, enddate))
         else:
             print(args.out_format, " is not supported yet.")
