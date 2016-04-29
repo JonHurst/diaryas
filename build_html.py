@@ -58,8 +58,10 @@ def build_html(diary, startdate, enddate):
                                               description=mo.group(2))
                 entry_type = "timed"
             elif e == "*School*":
+                e = e[1:-1]
                 entry_type = "school"
             elif e == "*Working*":
+                e = e[1:-1]
                 entry_type = "working"
             elif e[:3] == "xxx" and e[-3:] == "xxx":
                 e = e[3:-3]
