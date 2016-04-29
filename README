@@ -1,0 +1,47 @@
+This is a set of python scripts and templates to turn a set of text
+files representing diary and to do lists into various formats, such that
+they can be cleanly printed, placed on a web server and emailed.
+
+The main syntax:
+
+diaryas html
+        The diary in html form.
+
+diaryas htmlyearplan
+        A yearplan format in html form
+
+diaryas text
+        The diary in text form
+
+diaryas pdf
+        An A4 pdf
+
+diaryas pdfcards
+        Index cards sized pdf
+
+diaryas pdfyearplan
+        A printable A4 yearplan
+
+diaryas pdfcardsyearplan
+        A yearplan printable on index cards
+
+Options:
+        --start-tomorrow
+        -st
+                Start from tomorrow
+
+         --include-todo
+         -t
+                Add a todo/pending list to the top of the output
+
+
+The output file is sent to STDOUT.
+
+The input files are:
+    ~/org/diary.txt
+    ~/org/anniversaries
+    ~/org/expiry
+    ~/org/leave.el
+    ~/org/pending
+    ~/org/roster
+    ~/org/term-dates.el
