@@ -37,11 +37,14 @@ Options:
 
 The output file is sent to STDOUT.
 
-The input files are:
-    ~/org/diary.txt
+The input files for the diary are:
+    ~/org/diary
     ~/org/anniversaries
     ~/org/expiry
     ~/org/leave.el
-    ~/org/pending
     ~/org/roster
     ~/org/term-dates.el
+
+The input files for the todo list are:
+    ~/org/todo
+    ~/org/pending
