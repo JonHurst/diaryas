@@ -16,14 +16,13 @@ diary_source = ["diary", "anniversaries", "expiry", "leave.el", "roster", "term-
 todo_source = ["todo", "pending"]
 
 
-def get_diary(days, startdate):
+def get_diary(startdate, enddate):
     """Returns the diary in the form ((DATE, (HOLIDAY, ...), TEXT, TEXT, ...), ..."""
     tf = tempfile.NamedTemporaryFile()
-    print("Running")
     cp= subprocess.run(["emacs", "--batch", "-Q",
                         "-l",  "~/.emacs-calendar.el",
                         "--eval", "(save-fancy-diary '(%d %d %d) %d \"%s\")" %
-                        (startdate.month, startdate.day, startdate.year, days, tf.name)])
+                        (startdate.month, startdate.day, startdate.year, (enddate - startdate).days + 1, tf.name)])
     retval = []
     current = None
     reo_date = re.compile(r"((?:Saturday|Sunday|Monday|Tuesday|Wednesday|Thursday|Friday)[^:]*)[:\s]*([^\Z]+)?")
@@ -48,6 +47,7 @@ def get_diary(days, startdate):
                 current[1].append(l)
             else:
                 current.append(l)
+    retval.append(current)
     del retval[0] #remove None that is appended as first entry
     #replace string date with datetime object
     reo_date = re.compile(r"(\d+)/(\d+)/(\d+)")
@@ -76,6 +76,7 @@ if __name__ == "__main__":
         parser.add_argument("out_format",
                             help="Output format: \t\n"
                             "html | htmlyearplan | text | pdf | pdfcards | pdfyearplan | pdfcardyearplan")
+        print(parser.add_argument("-st", "--start-tomorrow", action='store_true'))
         args = parser.parse_args()
         #load cached variables
         diary_checksums, diary = [ ], [ ]
@@ -84,12 +85,18 @@ if __name__ == "__main__":
             (diary_checksums, diary) = pickle.load(pf)
             pf.close()
         diary_changed = not(checksum(diary_checksums))
-        if diary_changed:
-            #startdate startdate is first day of current month
-            startdate = datetime.date.today().replace(day=1)
-            days = (startdate.replace(year=startdate.year + 1) - startdate).days + 1
-            #retrieve the data
-            diary = get_diary(days, startdate)
+        #calculate required dates, use cache if possible
+        delta = datetime.timedelta()
+        if args.start_tomorrow: delta = datetime.timedelta(days=1)
+        startdate = datetime.date.today() + delta
+        if args.out_format in ("htmlyearplan", "pdfyearplan", "pdfcardyearplan"):
+            startdate = startdate.replace(day=1)
+            enddate = startdate.replace(year=startdate.year + 1) - datetime.timedelta(days=1)
+        else:
+            enddate = startdate + datetime.timedelta(days=90)
+        print(startdate, enddate)
+        if (diary == [ ] or diary_changed or (startdate < diary[0][0]) or (enddate > diary[-1][0])):
+            diary = get_diary(startdate, enddate)
         for e in diary: print(e)
         #store cache
         pf = open(diary_pickle_file, "wb")
