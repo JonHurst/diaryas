@@ -10,7 +10,7 @@ import re
 import pickle
 import hashlib
 
-pickle_file = os.path.join(os.environ['HOME'], ".cache/diaryas/cache")
+diary_pickle_file = os.path.join(os.environ['HOME'], ".cache/diaryas/diary")
 org_dir = os.path.join(os.environ['HOME'], "org")
 diary_source = ["diary", "anniversaries", "expiry", "leave.el", "roster", "term-dates.el"]
 todo_source = ["todo", "pending"]
@@ -72,8 +72,8 @@ if __name__ == "__main__":
         args = parser.parse_args()
         #load cached variables
         diary_checksums, diary = [ ], [ ]
-        if os.path.isfile(pickle_file):
-            pf = open(pickle_file, "rb")
+        if os.path.isfile(diary_pickle_file):
+            pf = open(diary_pickle_file, "rb")
             (diary_checksums, diary) = pickle.load(pf)
             pf.close()
         diary_changed = not(checksum(diary_checksums))
@@ -83,9 +83,9 @@ if __name__ == "__main__":
             days = (startdate.replace(year=startdate.year + 1) - startdate).days + 1
             #retrieve the data
             diary = get_diary(days, startdate)
-        print(diary)
+        for e in diary: print(e)
         #store cache
-        pf = open(pickle_file, "wb")
+        pf = open(diary_pickle_file, "wb")
         pickle.dump((diary_checksums, diary), pf)
         pf.close()
 
