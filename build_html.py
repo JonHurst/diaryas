@@ -63,6 +63,9 @@ def build_html(diary, startdate, enddate):
             elif e == "*Working*":
                 e = e[1:-1]
                 entry_type = "working"
+            elif e[0] == "*" and e[-1] == "*":
+                e = e[1:-1]
+                entry_type = "yearplanevent"
             elif e[:3] == "xxx" and e[-3:] == "xxx":
                 e = e[3:-3]
                 entry_type = "strike"
