@@ -10,6 +10,8 @@ import re
 import pickle
 import hashlib
 
+import build_html
+
 diary_pickle_file = os.path.join(os.environ['HOME'], ".cache/diaryas/diary")
 org_dir = os.path.join(os.environ['HOME'], "org")
 diary_source = ["diary", "anniversaries", "expiry", "leave.el", "roster", "term-dates.el"]
@@ -76,7 +78,7 @@ if __name__ == "__main__":
         parser.add_argument("out_format",
                             help="Output format: \t\n"
                             "html | htmlyearplan | text | pdf | pdfcards | pdfyearplan | pdfcardyearplan")
-        print(parser.add_argument("-st", "--start-tomorrow", action='store_true'))
+        parser.add_argument("-st", "--start-tomorrow", action='store_true')
         args = parser.parse_args()
         #load cached variables
         diary_checksums, diary = [ ], [ ]
@@ -94,10 +96,12 @@ if __name__ == "__main__":
             enddate = startdate.replace(year=startdate.year + 1) - datetime.timedelta(days=1)
         else:
             enddate = startdate + datetime.timedelta(days=90)
-        print(startdate, enddate)
         if (diary == [ ] or diary_changed or (startdate < diary[0][0]) or (enddate > diary[-1][0])):
             diary = get_diary(startdate, enddate)
-        for e in diary: print(e)
+        if args.out_format == "html":
+            print(build_html.build_html(diary, startdate, enddate))
+        else:
+            print(args.out_format, " is not supported yet.")
         #store cache
         pf = open(diary_pickle_file, "wb")
         pickle.dump((diary_checksums, diary), pf)
