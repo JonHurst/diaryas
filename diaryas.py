@@ -17,7 +17,7 @@ todo_source = ["todo", "pending"]
 
 
 def get_diary(days, startdate):
-    """Returns the diary in the form ((DAY_DESCRIPTOR, (HOLIDAY, ...), TEXT, TEXT, ...), ..."""
+    """Returns the diary in the form ((DATE, (HOLIDAY, ...), TEXT, TEXT, ...), ..."""
     tf = tempfile.NamedTemporaryFile()
     print("Running")
     cp= subprocess.run(["emacs", "--batch", "-Q",
@@ -48,7 +48,14 @@ def get_diary(days, startdate):
                 current[1].append(l)
             else:
                 current.append(l)
-    return retval[1:]
+    del retval[0] #remove None that is appended as first entry
+    #replace string date with datetime object
+    reo_date = re.compile(r"(\d+)/(\d+)/(\d+)")
+    for c, r in enumerate(retval):
+        mo = reo_date.search(r[0])
+        args = [int(X) for X in reversed(mo.groups())]
+        retval[c][0] = datetime.date(*args)
+    return retval
 
 
 def checksum(diary_checksums):
