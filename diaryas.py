@@ -99,6 +99,8 @@ if __name__ == "__main__":
         if args.out_format == "html":
             if args.start_tomorrow: startdate += datetime.timedelta(days=1)
             print(build_html.build_html(diary, startdate, enddate))
+        elif args.out_format == "htmlyearplan":
+            print(build_html.build_html_yearplan(diary, startdate, enddate))
         else:
             print(args.out_format, " is not supported yet.")
         #store cache
