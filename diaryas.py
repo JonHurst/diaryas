@@ -79,9 +79,11 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser()
         parser.add_argument("out_format",
                             help="Output format: \t\n"
-                            "html | htmlyearplan | text | pdf | pdfcards | pdfyearplan | pdfcardyearplan")
-        parser.add_argument("-st", "--start-tomorrow", action='store_true')
-        parser.add_argument("-c", "--card", action='store_true')
+                            "html | htmlyearplan | latex | text")
+        parser.add_argument("-st", "--start-tomorrow", action='store_true',
+                            help="Start diary output from tomorrow (html | latex only)")
+        parser.add_argument("-c", "--card", action='store_true',
+                            help="Create LaTeX sized for 3\" by 5\" index card")
         args = parser.parse_args()
         #load cached variables
         diary_checksums, diary = [ ], [ ]
