@@ -132,6 +132,7 @@ def build_html_yearplan(diary, startdate, enddate):
         weekend, jon, kids, entry = ("",) * 4
         if d[0].weekday() >= 5: weekend = "we"
         for e in d[2:]:
+            e = html.escape(e)
             if e == "*School*": kids = "kids"
             elif e == "*Working*": jon = "jon"
             elif (e[0] == "*" and e[-1] == "*"): entry = e[1:-1]
