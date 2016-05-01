@@ -4,26 +4,21 @@ they can be cleanly printed, placed on a web server and emailed.
 
 The main syntax:
 
+diaryas text
+        The diary in text form
+
 diaryas html
         The diary in html form.
 
 diaryas htmlyearplan
         A yearplan format in html form
 
-diaryas text
-        The diary in text form
+diaryas latex
+        The diary in LaTex suitable for processing with pdflatex
 
-diaryas pdf
-        An A4 pdf
+diaryas latexyearplan
+        The yearplan in LaTex suitable for processing with pdflatex
 
-diaryas pdfcards
-        Index cards sized pdf
-
-diaryas pdfyearplan
-        A printable A4 yearplan
-
-diaryas pdfcardsyearplan
-        A yearplan printable on index cards
 
 Options:
         --start-tomorrow
@@ -34,6 +29,9 @@ Options:
          -t
                 Add a todo/pending list to the top of the output
 
+         --card
+         -c
+                Produce LaTex in index card size
 
 The output file is sent to STDOUT.
 

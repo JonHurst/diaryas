@@ -1,4 +1,4 @@
-def latex_escape(str):
+def escape(str):
     subs = {"$": r"\$",
             "&": r"\&",
             "%": r"\%",

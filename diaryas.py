@@ -11,6 +11,7 @@ import pickle
 import hashlib
 
 import build_html
+import build_latex
 
 diary_pickle_file = os.path.join(os.environ['HOME'], ".cache/diaryas/diary")
 org_dir = os.path.join(os.environ['HOME'], "org")
@@ -101,6 +102,9 @@ if __name__ == "__main__":
             print(build_html.build_html(diary, startdate, enddate))
         elif args.out_format == "htmlyearplan":
             print(build_html.build_html_yearplan(diary, startdate, enddate))
+        elif args.out_format == "latex":
+            if args.start_tomorrow: startdate += datetime.timedelta(days=1)
+            print(build_latex.build_latex(diary, startdate, enddate))
         else:
             print(args.out_format, " is not supported yet.")
         #store cache
