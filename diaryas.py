@@ -80,6 +80,7 @@ if __name__ == "__main__":
                             help="Output format: \t\n"
                             "html | htmlyearplan | text | pdf | pdfcards | pdfyearplan | pdfcardyearplan")
         parser.add_argument("-st", "--start-tomorrow", action='store_true')
+        parser.add_argument("-c", "--card", action='store_true')
         args = parser.parse_args()
         #load cached variables
         diary_checksums, diary = [ ], [ ]
@@ -104,7 +105,7 @@ if __name__ == "__main__":
             print(build_html.build_html_yearplan(diary, startdate, enddate))
         elif args.out_format == "latex":
             if args.start_tomorrow: startdate += datetime.timedelta(days=1)
-            print(build_latex.build_latex(diary, startdate, enddate))
+            print(build_latex.build_latex(diary, startdate, enddate, args.card))
         else:
             print(args.out_format, " is not supported yet.")
         #store cache

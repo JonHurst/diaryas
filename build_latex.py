@@ -47,8 +47,8 @@ tmargin=0.25in, bmargin=0.55in, lmargin=0.25in, rmargin=0.25in]{geometry}
   \hspace{1em}#2\\}}
 
 \newcommand{\diaryday}[2]{%
-  \raggedright{\bf #1}\\
-  #2
+  \vbox{\raggedright{\bf #1}\\
+  #2}
 
 \vspace{3mm}}
 
@@ -80,7 +80,7 @@ working_t = r"\fcolorbox{black}{red}{\strut Working}"
 notworking_t = r"\fcolorbox{black}{white}{\strut Not Working}"
 flags_t = string.Template("\\event{$working $school}\n")
 
-def build_latex(diary, startdate, enddate):
+def build_latex(diary, startdate, enddate, card=False):
     body = ""
     reo_entry = re.compile(r"([\d:]{5}[zZ]?(?:-[\d:]{5}[zZ]?)?(?:ish)?)\s*(.+)\Z")
     for d in diary:
@@ -111,4 +111,5 @@ def build_latex(diary, startdate, enddate):
             color="black",
             date=d[0].strftime("%A, %d/%m/%Y"),
             events = "".join(holidays) + flags + "".join(events))
-    return a4diary_t.substitute(body=body)
+    main_t = carddiary_t if card else a4diary_t
+    return main_t.substitute(body=body)
