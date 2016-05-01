@@ -23,10 +23,12 @@ todo_source = ["todo", "pending"]
 def get_diary(startdate, enddate):
     """Returns the diary in the form ((DATE, (HOLIDAY, ...), TEXT, TEXT, ...), ..."""
     tf = tempfile.NamedTemporaryFile()
+    FNULL = open(os.devnull, 'w')
     cp= subprocess.run(["emacs", "--batch", "-Q",
                         "-l",  "~/.emacs-calendar.el",
                         "--eval", "(save-fancy-diary '(%d %d %d) %d \"%s\")" %
-                        (startdate.month, startdate.day, startdate.year, (enddate - startdate).days + 1, tf.name)])
+                        (startdate.month, startdate.day, startdate.year, (enddate - startdate).days + 1, tf.name)],
+                       stdout=FNULL, stderr=subprocess.STDOUT)
     retval = []
     current = None
     reo_date = re.compile(r"((?:Saturday|Sunday|Monday|Tuesday|Wednesday|Thursday|Friday)[^:]*)[:\s]*([^\Z]+)?")
