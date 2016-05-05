@@ -13,6 +13,7 @@ import hashlib
 import build_html
 import build_htmlyearplan
 import build_latex
+import build_latexyearplan
 
 diary_pickle_file = os.path.join(os.environ['HOME'], ".cache/diaryas/diary")
 org_dir = os.path.join(os.environ['HOME'], "org")
@@ -81,7 +82,7 @@ if __name__ == "__main__":
         parser = argparse.ArgumentParser()
         parser.add_argument("out_format",
                             help="Output format: \t\n"
-                            "html | htmlyearplan | latex | text")
+                            "html | htmlyearplan | latex | latexyearplan")
         parser.add_argument("-st", "--start-tomorrow", action='store_true',
                             help="Start diary output from tomorrow (html | latex only)")
         parser.add_argument("-c", "--card", action='store_true',
@@ -96,7 +97,7 @@ if __name__ == "__main__":
         diary_changed = not(checksum(diary_checksums))
         #calculate required dates, use cache if possible
         startdate = datetime.date.today()
-        if args.out_format in ("htmlyearplan", "pdfyearplan", "pdfcardyearplan"):
+        if args.out_format in ("htmlyearplan", "latexyearplan"):
             startdate = startdate.replace(day=1)
             enddate = startdate.replace(year=startdate.year + 1) - datetime.timedelta(days=1)
         else:
@@ -111,6 +112,8 @@ if __name__ == "__main__":
         elif args.out_format == "latex":
             if args.start_tomorrow: startdate += datetime.timedelta(days=1)
             print(build_latex.build_latex(diary, startdate, enddate, args.card))
+        elif args.out_format == "latexyearplan":
+            print(build_latexyearplan.build(diary, startdate, enddate))
         else:
             print(args.out_format, " is not supported yet.")
         #store cache
