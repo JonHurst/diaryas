@@ -9,11 +9,11 @@ main_t = string.Template("""\
 <head>
 <title>Diary</title>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-<link rel="stylesheet" type="text/css" href="styles.css"/>
+<link rel="stylesheet" type="text/css" href="diary.css"/>
 </head>
 <body>
-<h1>Diary</h1>
 <div id="diary">
+<h1>Diary</h1>
 $body
 </div>
 </body>
