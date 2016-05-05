@@ -17,8 +17,8 @@ import build_latexyearplan
 
 diary_pickle_file = os.path.join(os.environ['HOME'], ".cache/diaryas/diary")
 org_dir = os.path.join(os.environ['HOME'], "org")
-diary_source = ["diary", "anniversaries", "expiry", "leave.el", "roster", "term-dates.el"]
-todo_source = ["todo", "pending"]
+diary_source = ["diary", "anniversaries", "expiry", "leave.el", "roster",
+                "term-dates.el", "kids-activities"]
 
 
 def get_diary(startdate, enddate):
