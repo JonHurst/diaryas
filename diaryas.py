@@ -113,7 +113,7 @@ if __name__ == "__main__":
             if args.start_tomorrow: startdate += datetime.timedelta(days=1)
             print(build_latex.build_latex(diary, startdate, enddate, args.card))
         elif args.out_format == "latexyearplan":
-            print(build_latexyearplan.build(diary, startdate, enddate))
+            print(build_latexyearplan.build(diary, startdate, enddate, args.card))
         else:
             print(args.out_format, " is not supported yet.")
         #store cache

@@ -43,14 +43,61 @@ $months_bot
 \end{document}
 """)
 
+
+card_yearplan_t = string.Template(
+r"""\documentclass{article}
+\pagestyle{empty}
+\usepackage[utf8]{inputenc}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage[paperwidth=3in,paperheight=5in,
+tmargin=8mm, bmargin=15mm, lmargin=7mm, rmargin=7mm]{geometry}
+
+\setlength{\tabcolsep}{0in}
+\setlength{\parindent}{0pt}
+
+\newenvironment{monthtable}[1]{%
+\scriptsize
+\begin{tabular}[t]%
+{|>{\centering\hspace{0pt}}p{0.2in}%
+  |p{0.1in}%
+  |p{0.1in}%
+  |>{\raggedright\hspace{0pt}}p{0.75in}|}
+\hline
+\multicolumn{4}{|c|}{#1}\tabularnewline\hline
+}
+{\end{tabular}}
+
+\newcommand{\dentry}[4]{
+#1&#2&#3&#4\tabularnewline\hline}
+
+\newcommand{\jwork}{\cellcolor{red}}
+\newcommand{\kschool}{\cellcolor{green}}
+\newcommand{\we}{\rowcolor[gray]{0.8}}
+
+\begin{document}
+$body
+\end{document}
+""")
+
 monthtable_t = string.Template(
-    r"""\begin{monthtable}{$month_name}
+r"""\begin{monthtable}{$month_name}
 $month_entries
 \end{monthtable}
 """)
 
 
-def build(diary, startdate, enddate):
+# card_body_t = string.Template(
+# r"""\hfill$month_left\hfill$month_right\hspace*{\fill}
+# """)
+
+card_body_t = string.Template(
+r"""$month_left\hfill$month_right
+""")
+
+
+
+def build(diary, startdate, enddate, card=False):
     months = {}
     for d in diary:
         if d[0] < startdate: continue
@@ -72,7 +119,15 @@ def build(diary, startdate, enddate):
         months[k] = monthtable_t.substitute(month_name=k.strftime("%B %Y"),
                                             month_entries="\n".join(months[k]))
     monthkeys = list(months.keys()); monthkeys.sort()
-    months_top = "\hfill".join([months[k] for k in monthkeys[:6]])
-    months_bot = "\hfill".join([months[k] for k in monthkeys[6:]])
-    return a4_yearplan_t.substitute(months_top=months_top,
-                                    months_bot=months_bot)
+    if card:
+        cards = []
+        for c in range(0, 12, 2):
+            cards.append(card_body_t.substitute(month_left=months[monthkeys[c]],
+                                                month_right=months[monthkeys[c + 1]]))
+        return card_yearplan_t.substitute(
+            body="\\pagebreak\n".join(cards))
+    else:
+        months_top = "\hfill".join([months[k] for k in monthkeys[:6]])
+        months_bot = "\hfill".join([months[k] for k in monthkeys[6:]])
+        return a4_yearplan_t.substitute(months_top=months_top,
+                                        months_bot=months_bot)
