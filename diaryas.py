@@ -101,9 +101,9 @@ if __name__ == "__main__":
             startdate = startdate.replace(day=1)
             enddate = startdate.replace(year=startdate.year + 1) - datetime.timedelta(days=1)
         else:
-            enddate = startdate + datetime.timedelta(days=90)
+            enddate = startdate + datetime.timedelta(days=56)
         if (diary == [ ] or diary_changed or (startdate < diary[0][0]) or (enddate > diary[-1][0])):
-            diary = get_diary(startdate, enddate)
+            diary = get_diary(startdate, enddate + datetime.timedelta(days=7)) #extra 7 days for sport
         if args.out_format == "html":
             if args.start_tomorrow: startdate += datetime.timedelta(days=1)
             print(build_html.build_html(diary, startdate, enddate))
