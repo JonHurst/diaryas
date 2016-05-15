@@ -7,6 +7,7 @@ r"""\documentclass{article}
 \pagestyle{empty}
 \usepackage[utf8]{inputenc}
 \usepackage{color}
+\usepackage{ulem}
 \usepackage[paper=a4paper,
 tmargin=0.75in, bmargin=0.75in, lmargin=0.25in, rmargin=0.25in]{geometry}
 \setlength\parindent{0pt}
@@ -93,6 +94,10 @@ def build_latex(diary, startdate, enddate, card=False):
         school_p, working_p = False, False
         events = []
         for e in d[2:]:
+            sout_p = False
+            if e[:3] == "xxx" and e[-3:] == "xxx":
+                sout_p = True
+                e = e[3:-3]
             e = latex_escape.escape(e)
             if e == "*School*": school_p = True
             elif e == "*Working*": working_p = True
@@ -101,9 +106,16 @@ def build_latex(diary, startdate, enddate, card=False):
             else:
                 mo = reo_entry.match(e)
                 if mo:
-                    events.append(timed_event_t.substitute(timestring=mo.group(1),
-                                                           description=mo.group(2)))
+                    ts = mo.group(1)
+                    de = mo.group(2)
+                    if sout_p:
+                        ts = r"\sout{" + ts + "}"
+                        de = r"\sout{" + de + "}"
+                    events.append(timed_event_t.substitute(timestring=ts,
+                                                           description=de))
                 else:
+                    if sout_p:
+                        e = r"\sout{" + e + "}"
                     events.append(std_event_t.substitute(e=e))
         flags = flags_t.substitute(working=working_t if working_p else notworking_t,
                                    school=school_t if school_p else "")
