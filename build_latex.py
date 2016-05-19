@@ -37,6 +37,7 @@ r"""\documentclass{article}
 \pagestyle{empty}
 \usepackage[utf8]{inputenc}
 \usepackage{xcolor}
+\usepackage{ulem}
 \usepackage[paperwidth=3in,paperheight=5in,
 tmargin=0.25in, bmargin=0.55in, lmargin=0.25in, rmargin=0.25in]{geometry}
 \setlength\parindent{0pt}
