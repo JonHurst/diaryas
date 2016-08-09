@@ -10,7 +10,9 @@ def escape(str):
             "^": r"$\wedge$",
             "\\": r"$\backslash$",
             "<": "$<$",
-            ">": "$>$"}
+            ">": "$>$",
+            "δ": "$\delta$"
+    }
     outstr = ""
     open_double_quote = True
     for c in str:
