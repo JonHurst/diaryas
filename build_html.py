@@ -51,6 +51,10 @@ def build_html(diary, startdate, enddate):
                                                        description=html.escape(e))
         for e in d[2:]:
             e = html.escape(e)
+            strike = False
+            if e[:3] == "xxx" and e[-3:] == "xxx":
+                e = e[3:-3]
+                strike = True
             mo = reo_entry.match(e)
             entry_type = "entry"
             if mo:
@@ -66,9 +70,8 @@ def build_html(diary, startdate, enddate):
             elif e[0] == "*" and e[-1] == "*":
                 e = e[1:-1]
                 entry_type = "yearplanevent"
-            elif e[:3] == "xxx" and e[-3:] == "xxx":
-                e = e[3:-3]
-                entry_type = "strike"
+            if strike:
+                e = "<del>" + e + "</del>"
             entries += entrystring_t.substitute(type=entry_type,
                                                        description=e)
         entrybody = ""
