@@ -4,9 +4,6 @@ they can be cleanly printed, placed on a web server and emailed.
 
 The main syntax:
 
-diaryas text
-        The diary in text form
-
 diaryas html
         The diary in html form.
 
@@ -25,11 +22,6 @@ Options:
         -st
                 Start from tomorrow
 
-         --include-todo
-         -t
-                Add a todo/pending list to the top of the output
-
-         --card
          -c
                 Produce LaTex in index card size
 
@@ -37,12 +29,9 @@ The output file is sent to STDOUT.
 
 The input files for the diary are:
     ~/org/diary
+    ~/org/roster
     ~/org/anniversaries
     ~/org/expiry
-    ~/org/leave.el
-    ~/org/roster
+    ~/org/kids-activities
     ~/org/term-dates.el
-
-The input files for the todo list are:
-    ~/org/todo
-    ~/org/pending
+    ~/org/leave.el
