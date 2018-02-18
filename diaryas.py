@@ -69,6 +69,7 @@ def get_diary(startdate, enddate):
         mo = reo_date.search(r[0])
         args = [int(X) for X in reversed(mo.groups())]
         retval[c][0] = datetime.date(*args)
+    #sys.stderr.write(str(retval)) #for debug - dump diary
     return retval
 
 
@@ -102,6 +103,7 @@ if __name__ == "__main__":
             (diary_checksums, diary) = pickle.load(pf)
             pf.close()
         diary_changed = not(checksum(diary_checksums))
+        #diary_changed = True #for debug - don't use cache
         #calculate required dates, use cache if possible
         startdate = datetime.date.today()
         if args.out_format in ("htmlyearplan", "latexyearplan"):
