@@ -42,7 +42,7 @@ entrystring_t = string.Template("""\
 
 def build_html(diary, startdate, enddate):
     body = ""
-    reo_entry = re.compile(r"([\d:]{5}[zZ]?(?:-[\d:]{5}[zZ]?)?(?:ish)?)\s*(.+)\Z")
+    reo_entry = re.compile(r"([\d:]{5}[zZ]?(?:-[\d:]{5}[zZ]?)?(?:ish)?)\s*(.+)\Z", re.DOTALL)
     for d in diary:
         if d[0] < startdate: continue
         if d[0] > enddate: break
@@ -59,8 +59,9 @@ def build_html(diary, startdate, enddate):
             mo = reo_entry.match(e)
             entry_type = "entry"
             if mo:
+                des = mo.group(2).replace("\n", "<br/> ")
                 e = timed_t.substitute(timestring=mo.group(1),
-                                              description=mo.group(2))
+                                              description=des)
                 entry_type = "timed"
             elif e == "*School*":
                 e = e[1:-1]

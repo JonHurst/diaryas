@@ -36,7 +36,7 @@ def get_diary(startdate, enddate):
     reo_underline = re.compile(r"^=+$")
     in_header = False
     for l in tf.readlines():
-        l = l.decode().strip()
+        l = l.decode().rstrip()
         mo = reo_date.match(l)
         if mo:
             in_header = True
@@ -50,10 +50,17 @@ def get_diary(startdate, enddate):
             in_header = False
             continue
         if len(l):
-            if in_header:
-                current[1].append(l)
+            if l[0].isspace():
+                l = "\n" + l.lstrip()
+                if in_header:
+                    current[1][-1] += l
+                else:
+                    current[-1] += l
             else:
-                current.append(l)
+                if in_header:
+                    current[1].append(l)
+                else:
+                    current.append(l)
     retval.append(current)
     del retval[0] #remove None that is appended as first entry
     #replace string date with datetime object
