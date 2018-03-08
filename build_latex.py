@@ -103,7 +103,7 @@ def build_latex(diary, startdate, enddate, card=False):
             if e == "*School*": school_p = True
             elif e == "*Working*": working_p = True
             elif (e[0] == "*" and e[-1] == "*"):
-                events.append(std_event_t.substitute(e=e[1:-1]))
+                events.append(std_event_t.substitute(e="\\textbf{" + e[1:-1] + "}"))
             else:
                 mo = reo_entry.match(e)
                 if mo:
