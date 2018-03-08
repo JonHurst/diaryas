@@ -84,7 +84,7 @@ flags_t = string.Template("\\event{$working $school}\n")
 
 def build_latex(diary, startdate, enddate, card=False):
     body = ""
-    reo_entry = re.compile(r"([\d:]{5}[zZ]?(?:-[\d:]{5}[zZ]?)?(?:ish)?)\s*(.+)\Z", re.DOTALL)
+    reo_entry = re.compile(r"([\d:]{5}(?:-[\d:]{5})?(?:\s\[\w+\])?)\s*(.+)\Z", re.DOTALL)
     for d in diary:
         if d[0] < startdate: continue
         if d[0] > enddate: break
