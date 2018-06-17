@@ -73,6 +73,9 @@ def build_html(diary, startdate, enddate):
             elif e == "*Working*":
                 e = e[1:-1]
                 entry_type = "working"
+            elif e == "*NSCD*":
+                e = e[1:-1]
+                entry_type = "nscd"
             elif e[0] == "*" and e[-1] == "*":
                 e = e[1:-1]
                 entry_type = "yearplanevent"

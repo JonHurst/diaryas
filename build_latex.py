@@ -6,7 +6,7 @@ a4diary_t = string.Template(
 r"""\documentclass{article}
 \pagestyle{empty}
 \usepackage[utf8]{inputenc}
-\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{ulem}
 \usepackage[paper=a4paper,
 tmargin=0.75in, bmargin=0.75in, lmargin=0.25in, rmargin=0.25in]{geometry}
@@ -36,7 +36,7 @@ carddiary_t = string.Template(
 r"""\documentclass{article}
 \pagestyle{empty}
 \usepackage[utf8]{inputenc}
-\usepackage{xcolor}
+\usepackage[dvipsnames]{xcolor}
 \usepackage{ulem}
 \usepackage[paperwidth=3in,paperheight=5in,
 tmargin=0.25in, bmargin=0.55in, lmargin=0.25in, rmargin=0.25in]{geometry}
@@ -80,7 +80,8 @@ r"""\timedevent{$timestring}{$description}
 school_t = r"\fcolorbox{black}{green}{\strut School}"
 working_t = r"\fcolorbox{black}{red}{\strut Working}"
 notworking_t = r"\fcolorbox{black}{white}{\strut Not Working}"
-flags_t = string.Template("\\event{$working $school}\n")
+nscd_t = r"\fcolorbox{black}{SkyBlue}{\strut NSCD}"
+flags_t = string.Template("\\event{$working $school $nscd}\n")
 
 
 def process_strikethrough(s):
@@ -99,16 +100,13 @@ def build_latex(diary, startdate, enddate, card=False):
         for e in d[1]: #holidays
             e = latex_escape.escape(e)
             holidays.append(holiday_event_t.substitute(e=e))
-        school_p, working_p = False, False
+        school_p, working_p, nscd_p = False, False, False
         events = []
         for e in d[2:]:
-            sout_p = False
-            if e[:3] == "xxx" and e[-3:] == "xxx":
-                sout_p = True
-                e = e[3:-3]
             e = latex_escape.escape(e)
             if e == "*School*": school_p = True
             elif e == "*Working*": working_p = True
+            elif e == "*NSCD*": nscd_p = True
             elif (e[0] == "*" and e[-1] == "*"):
                 events.append(std_event_t.substitute(e="\\textbf{" + e[1:-1] + "}"))
             else:
@@ -124,7 +122,8 @@ def build_latex(diary, startdate, enddate, card=False):
                     e = process_strikethrough(e)
                     events.append(std_event_t.substitute(e=e))
         flags = flags_t.substitute(working=working_t if working_p else notworking_t,
-                                   school=school_t if school_p else "")
+                                   school=school_t if school_p else "",
+                                   nscd=nscd_t if nscd_p else "")
         body += diaryday_t.substitute(
             color="black",
             date=d[0].strftime("%A, %d/%m/%Y"),

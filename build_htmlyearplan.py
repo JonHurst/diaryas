@@ -27,9 +27,9 @@ $monthset
 month_t = string.Template("""\
 <div class="month">
 <table>
-<colgroup><col class="date"/><col class="dayoff" span="2" /><col class="description"/></colgroup>
+<colgroup><col class="date"/><col class="dayoff" span="3" /><col class="description"/></colgroup>
 <thead>
-<tr><th colspan="4">$month_name</th></tr>
+<tr><th colspan="5">$month_name</th></tr>
 </thead>
 <tbody>
 $rows
@@ -39,7 +39,7 @@ $rows
 """)
 
 row_t = string.Template("""\
-<tr class="$we"><td class="date">$day</td><td class='$jon'></td><td class='$kids'></td><td>$entry</td></tr>\
+<tr class="$we"><td class="date">$day</td><td class='$jon'></td><td class='$kids'></td><td class='$nscd'></td><td>$entry</td></tr>\
 """)
 
 
@@ -50,18 +50,20 @@ def build_html_yearplan(diary, startdate, enddate):
         if d[0] > enddate: break
         month_id = d[0].replace(day=1) #use first day of month as identifier
         if month_id not in months: months[month_id] = []
-        weekend, jon, kids, entry = ("",) * 4
+        weekend, jon, kids, nscd, entry = ("",) * 5
         if d[0].weekday() >= 5: weekend = "we"
         for e in d[2:]:
             e = html.escape(e)
             if e == "*School*": kids = "kids"
             elif e == "*Working*": jon = "jon"
+            elif e == "*NSCD*": nscd = "nscd"
             elif (e[0] == "*" and e[-1] == "*"): entry = e[1:-1]
         months[month_id].append(
             row_t.substitute(we=weekend,
                              day=d[0].day,
                              jon=jon,
                              kids=kids,
+                             nscd=nscd,
                              entry=entry))
     skeys = list(months.keys()); skeys.sort()
     monthset_keys = [skeys[i:i + 3] for i in range(0, len(skeys), 3)]

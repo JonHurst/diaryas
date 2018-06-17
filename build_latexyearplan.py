@@ -19,16 +19,18 @@ tmargin=1.5in, bmargin=.75in, lmargin=5mm, rmargin=5mm]{geometry}
 {|>{\centering\hspace{0pt}}p{0.2in}%
   |p{0.1in}%
   |p{0.1in}%
-  |>{\raggedright\hspace{0pt}}p{0.75in}|}
+  |p{0.1in}%
+  |>{\raggedright\hspace{0pt}}p{0.65in}|}
 \hline
-\multicolumn{4}{|c|}{#1}\tabularnewline\hline}
+\multicolumn{5}{|c|}{#1}\tabularnewline\hline}
 {\end{tabular}}
 
-\newcommand{\dentry}[4]{%
-#1&#2&#3&#4\tabularnewline\hline}
+\newcommand{\dentry}[5]{%
+#1&#2&#3&#4&#5\tabularnewline\hline}
 
 \newcommand{\jwork}{\cellcolor{red}}
 \newcommand{\kschool}{\cellcolor{green}}
+\newcommand{\nscd}{\cellcolor{cyan}}
 \newcommand{\we}{\rowcolor[gray]{0.8}}
 
 \begin{document}
@@ -62,17 +64,18 @@ tmargin=8mm, bmargin=15mm, lmargin=7mm, rmargin=7mm]{geometry}
 {|>{\centering\hspace{0pt}}p{0.2in}%
   |p{0.1in}%
   |p{0.1in}%
-  |>{\raggedright\hspace{0pt}}p{0.75in}|}
+  |p{0.1in}%
+  |>{\raggedright\hspace{0pt}}p{0.65in}|}
 \hline
-\multicolumn{4}{|c|}{#1}\tabularnewline\hline
-}
+\multicolumn{5}{|c|}{#1}\tabularnewline\hline}
 {\end{tabular}}
 
-\newcommand{\dentry}[4]{
-#1&#2&#3&#4\tabularnewline\hline}
+\newcommand{\dentry}[5]{
+#1&#2&#3&#4&#5\tabularnewline\hline}
 
 \newcommand{\jwork}{\cellcolor{red}}
 \newcommand{\kschool}{\cellcolor{green}}
+\newcommand{\nscd}{\cellcolor{cyan}}
 \newcommand{\we}{\rowcolor[gray]{0.8}}
 
 \begin{document}
@@ -104,7 +107,7 @@ def build(diary, startdate, enddate, card=False):
         if d[0] > enddate: break
         month_id = d[0].replace(day=1) #use first day of month as identifier
         if month_id not in months: months[month_id] = []
-        jon, kids, entry = ("{}",) * 3
+        jon, kids, nscd, entry = ("{}",) * 4
         day = r"\dentry{" + str(d[0].day) + "}"
         if d[0].weekday() >= 5:
             day = r"\we" + day
@@ -112,9 +115,10 @@ def build(diary, startdate, enddate, card=False):
             e = latex_escape.escape(e)
             if e == "*School*": kids = "\kschool"
             elif e == "*Working*": jon = r"\jwork"
+            elif e == "*NSCD*": nscd = r"\nscd"
             elif (e[0] == "*" and e[-1] == "*"):
                 entry = "{" + e[1:-1] + "}"
-        months[month_id].append(day + jon + kids + entry)
+        months[month_id].append(day + jon + kids + nscd + entry)
     for k in months.keys():
         months[k] = monthtable_t.substitute(month_name=k.strftime("%B %Y"),
                                             month_entries="\n".join(months[k]))
