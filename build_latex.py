@@ -82,6 +82,13 @@ working_t = r"\fcolorbox{black}{red}{\strut Working}"
 notworking_t = r"\fcolorbox{black}{white}{\strut Not Working}"
 flags_t = string.Template("\\event{$working $school}\n")
 
+
+def process_strikethrough(s):
+    if s[:3] == "xxx" and s[-3:] == "xxx":
+        s = r"\sout{" + s[3:-3] + "}"
+    return s
+
+
 def build_latex(diary, startdate, enddate, card=False):
     body = ""
     reo_entry = re.compile(r"([\d:]{5}(?:-[\d:]{5})?(?:\s\[\w+\])?)\s*(.+)\Z", re.DOTALL)
@@ -110,14 +117,11 @@ def build_latex(diary, startdate, enddate, card=False):
                     ts = mo.group(1)
                     de = mo.group(2)
                     de = de.replace("\n", r"\\\hspace{1em}")
-                    if sout_p:
-                        ts = r"\sout{" + ts + "}"
-                        de = r"\sout{" + de + "}"
+                    de = process_strikethrough(de)
                     events.append(timed_event_t.substitute(timestring=ts,
                                                            description=de))
                 else:
-                    if sout_p:
-                        e = r"\sout{" + e + "}"
+                    e = process_strikethrough(e)
                     events.append(std_event_t.substitute(e=e))
         flags = flags_t.substitute(working=working_t if working_p else notworking_t,
                                    school=school_t if school_p else "")

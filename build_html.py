@@ -40,6 +40,13 @@ entrystring_t = string.Template("""\
 """)
 
 
+def process_strikethrough(s):
+    if s[:3] == "xxx" and s[-3:] == "xxx":
+        s = "<del>" + s[3:-3] + "</del>"
+    return s
+
+
+
 def build_html(diary, startdate, enddate):
     body = ""
     reo_entry = re.compile(r"([\d:]{5}(?:-[\d:]{5})?(?:\s\[\w+\])?)\s*(.+)\Z", re.DOTALL)
@@ -52,14 +59,11 @@ def build_html(diary, startdate, enddate):
                                                        description=html.escape(e))
         for e in d[2:]:
             e = html.escape(e)
-            strike = False
-            if e[:3] == "xxx" and e[-3:] == "xxx":
-                e = e[3:-3]
-                strike = True
             mo = reo_entry.match(e)
             entry_type = "entry"
             if mo:
                 des = mo.group(2).replace("\n", "<br/> ")
+                des = process_strikethrough(des)
                 e = timed_t.substitute(timestring=mo.group(1),
                                               description=des)
                 entry_type = "timed"
@@ -72,8 +76,8 @@ def build_html(diary, startdate, enddate):
             elif e[0] == "*" and e[-1] == "*":
                 e = e[1:-1]
                 entry_type = "yearplanevent"
-            if strike:
-                e = "<del>" + e + "</del>"
+            else:
+                e = process_strikethrough(e)
             entries += entrystring_t.substitute(type=entry_type,
                                                        description=e)
         entrybody = ""
