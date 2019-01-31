@@ -9,6 +9,7 @@ main_yearplan_t = string.Template("""\
 <title>Year planner</title>
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 <link rel="stylesheet" type="text/css" href="styles.css"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
 </head>
 <body id='yearplan'>
 <div class="page">
