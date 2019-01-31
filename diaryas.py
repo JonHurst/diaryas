@@ -32,7 +32,7 @@ def get_diary(startdate, enddate):
                        stdout=FNULL, stderr=subprocess.STDOUT)
     retval = []
     current = None
-    reo_date = re.compile(r"((?:Saturday|Sunday|Monday|Tuesday|Wednesday|Thursday|Friday)[^:]*)[:\s]*([^\Z]+)?")
+    reo_date = re.compile(r"((?:Saturday|Sunday|Monday|Tuesday|Wednesday|Thursday|Friday)[^:]*)[:\s]*(.*)")
     reo_underline = re.compile(r"^=+$")
     in_header = False
     for l in tf.readlines():
