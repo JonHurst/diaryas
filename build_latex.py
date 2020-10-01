@@ -77,7 +77,7 @@ timed_event_t = string.Template(
 r"""\timedevent{$timestring}{$description}
 """)
 
-school_t = r"\fcolorbox{black}{green}{\strut School}"
+school_t = r"\fcolorbox{black}{green}{\strut NTU}"
 working_t = r"\fcolorbox{black}{red}{\strut Working}"
 notworking_t = r"\fcolorbox{black}{white}{\strut Not Working}"
 nscd_t = r"\fcolorbox{black}{SkyBlue}{\strut NSCD}"
@@ -104,7 +104,7 @@ def build_latex(diary, startdate, enddate, card=False):
         events = []
         for e in d[2:]:
             e = latex_escape.escape(e)
-            if e == "*School*": school_p = True
+            if e == "*NTU*": school_p = True
             elif e == "*Working*": working_p = True
             elif e == "*NSCD*": nscd_p = True
             elif (e[0] == "*" and e[-1] == "*"):

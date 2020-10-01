@@ -67,9 +67,9 @@ def build_html(diary, startdate, enddate):
                 e = timed_t.substitute(timestring=mo.group(1),
                                               description=des)
                 entry_type = "timed"
-            elif e == "*School*":
+            elif e == "*NTU*":
                 e = e[1:-1]
-                entry_type = "school"
+                entry_type = "ntu"
             elif e == "*Working*":
                 e = e[1:-1]
                 entry_type = "working"
@@ -86,7 +86,9 @@ def build_html(diary, startdate, enddate):
         entrybody = ""
         if len(entries) != 0:
             entrybody = entrybody_t.substitute(entries=entries)
-        body += entryblock_t.substitute(date = d[0].strftime("%A, %d/%m/%Y"),
-                                               type="day " + d[0].strftime("%a").lower(),
-                                               entry_body=entrybody)
+        body += entryblock_t.substitute(
+            date = d[0].strftime("%A, %d/%m/%Y"),
+            isodate = d[0].strftime("%Y%m%d"),
+            type="day " + d[0].strftime("%a").lower(),
+            entry_body=entrybody)
     return main_t.substitute(body=body)

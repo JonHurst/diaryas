@@ -113,7 +113,7 @@ def build(diary, startdate, enddate, card=False):
             day = r"\we" + day
         for e in d[2:]:
             e = latex_escape.escape(e)
-            if e == "*School*": kids = "\kschool"
+            if e == "*NTU*": kids = "\kschool"
             elif e == "*Working*": jon = r"\jwork"
             elif e == "*NSCD*": nscd = r"\nscd"
             elif (e[0] == "*" and e[-1] == "*"):
