@@ -11,8 +11,15 @@ main_t = string.Template("""\
 <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="diary.css"/>
+<script>
+  function highlight_current_date() {
+    var d = new Date();
+    var id = "d" + d.toISOString().split("T")[0].replace(/-/g, "");
+    var el = document.getElementById(id).classList.add("today");
+  }
+</script>
 </head>
-<body>
+<body onload="highlight_current_date()">
 <div id="diary">
 <h1>Diary</h1>
 $body
@@ -22,8 +29,8 @@ $body
 """)
 
 entryblock_t = string.Template("""\
-<h2 class='$type'>$date</h2>
-$entry_body
+<div id='d$isodate'><h2 class='$type'>$date</h2>
+$entry_body</div>
 """)
 
 entrybody_t = string.Template("""\
