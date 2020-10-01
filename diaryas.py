@@ -77,7 +77,8 @@ def checksum(diary_checksums):
     new_checksums = [ ]
     for fn in diary_source:
         f = open(os.path.join(org_dir, fn), "rb")
-        new_checksums.append(hashlib.sha256(f.read()).hexdigest())
+        if f:
+            new_checksums.append(hashlib.sha256(f.read()).hexdigest())
     if new_checksums != diary_checksums:
         diary_checksums[:] = new_checksums
         return False
