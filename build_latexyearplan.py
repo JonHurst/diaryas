@@ -4,7 +4,12 @@ import latex_escape
 a4_yearplan_t = string.Template(
 r"""\documentclass{article}
 \pagestyle{empty}
-\usepackage[utf8]{inputenc}
+
+\usepackage{fontspec}
+\newfontfamily{\symbolfont}{Symbola}
+\usepackage{ucharclasses}
+\setTransitionsForSymbols{\symbolfont}{}
+
 \usepackage{colortbl}
 \usepackage{array}
 \usepackage[paperwidth=210mm,paperheight=297mm,

@@ -5,7 +5,12 @@ import latex_escape
 a4diary_t = string.Template(
 r"""\documentclass{article}
 \pagestyle{empty}
-\usepackage[utf8]{inputenc}
+
+\usepackage{fontspec}
+\newfontfamily{\symbolfont}{Symbola}
+\usepackage{ucharclasses}
+\setTransitionsForSymbols{\symbolfont}{}
+
 \usepackage[dvipsnames]{xcolor}
 \usepackage{ulem}
 \usepackage[paper=a4paper,
