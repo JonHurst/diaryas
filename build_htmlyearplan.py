@@ -20,9 +20,7 @@ $monthsets
 """)
 
 monthset_t = string.Template("""\
-<div class="page">
 $monthset
-</div>
 """)
 
 month_t = string.Template("""\
