@@ -29,7 +29,8 @@ $body
 """)
 
 entryblock_t = string.Template("""\
-<div id='d$isodate'><h2 class='$type'>$date</h2>
+<div id='d$isodate'><h2 class='$type'>
+<a href="mailto:jon@hursts.org.uk?subject=Diary&body=$date">$date</a></h2>
 $entry_body</div>
 """)
 
