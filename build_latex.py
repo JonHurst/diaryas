@@ -14,7 +14,7 @@ r"""\documentclass{article}
 \usepackage[dvipsnames]{xcolor}
 \usepackage{ulem}
 \usepackage[paper=a4paper,
-tmargin=0.75in, bmargin=0.75in, lmargin=0.25in, rmargin=0.25in]{geometry}
+tmargin=0.75in, bmargin=1.5in, lmargin=0.25in, rmargin=0.25in]{geometry}
 \setlength\parindent{0pt}
 
 \newcommand{\event}[1]{\vspace{1mm}\small #1\\}
@@ -27,7 +27,7 @@ tmargin=0.75in, bmargin=0.75in, lmargin=0.25in, rmargin=0.25in]{geometry}
   \vbox{\raggedright{\bf #1}\\
   #2}
 
-\vspace{10mm plus 50mm minus 5mm}}
+\vspace{1in plus 0.5in minus 0.1in}}
 
 \usepackage{multicol}
 \begin{document}
