@@ -3,25 +3,20 @@ import re
 import html
 
 main_t = string.Template("""\
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title>Diary</title>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+<meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="stylesheet" type="text/css" href="common.css"/>
 <link rel="stylesheet" type="text/css" href="diary.css"/>
-<script>
-  function highlight_current_date() {
-    var d = new Date();
-    var id = "d" + d.toISOString().split("T")[0].replace(/-/g, "");
-    var el = document.getElementById(id).classList.add("today");
-  }
-</script>
+<link rel="icon" type='image/png' href="https://hursts.org.uk/favicon.png"/>
+<script src="diary.js"></script>
 </head>
-<body onload="highlight_current_date()">
-<div id="diary">
-<h1>Diary</h1>
+
+<body>
+<div class="org-page">
+<h1 class="org-heading org-heading--title">Diary</h1>
 $body
 </div>
 </body>
@@ -29,22 +24,22 @@ $body
 """)
 
 entryblock_t = string.Template("""\
-<div id='d$isodate'><h2 class='$type'>
-<a href="mailto:jon@hursts.org.uk?subject=Diary&body=$date">$date</a></h2>
+<div class="org-day" id='d$isodate'>
+<h2 class='$type'>$date</h2>
 $entry_body</div>
 """)
 
 entrybody_t = string.Template("""\
-<ul class='events'>
+<ul class='org-eventlist'>
 $entries</ul>
 """)
 
 timed_t = string.Template("""\
-<span class='time'>$timestring</span> $description
+<span class='org-time'>$timestring</span> $description
 """)
 
 entrystring_t = string.Template("""\
-<li class='$type'>$description</li>
+<li class='org-eventlist__event $type'>$description</li>
 """)
 
 
@@ -63,30 +58,30 @@ def build_html(diary, startdate, enddate):
         if d[0] > enddate: break
         entries = ""
         for e in d[1]:
-            entries += entrystring_t.substitute(type="holiday",
+            entries += entrystring_t.substitute(type="org-eventlist__event--holiday",
                                                        description=html.escape(e))
         for e in d[2:]:
             e = html.escape(e)
             mo = reo_entry.match(e)
-            entry_type = "entry"
+            entry_type = "org-eventlist__event--untimed"
             if mo:
                 des = mo.group(2).replace("\n", "<br/> ")
                 des = process_strikethrough(des)
                 e = timed_t.substitute(timestring=mo.group(1),
                                               description=des)
-                entry_type = "timed"
+                entry_type = "org-eventlist__event--timed"
             elif e == "*NTU*":
                 e = e[1:-1]
-                entry_type = "ntu"
+                entry_type = "org-eventlist__event--ntu"
             elif e == "*Working*":
                 e = e[1:-1]
-                entry_type = "working"
+                entry_type = "org-eventlist__event--working"
             elif e == "*NSCD*":
                 e = e[1:-1]
-                entry_type = "nscd"
+                entry_type = "org-eventlist__event--nscd"
             elif e[0] == "*" and e[-1] == "*":
                 e = e[1:-1]
-                entry_type = "yearplanevent"
+                entry_type = "org-eventlist__event--yearplanevent"
             else:
                 e = process_strikethrough(e)
             entries += entrystring_t.substitute(type=entry_type,
@@ -94,9 +89,14 @@ def build_html(diary, startdate, enddate):
         entrybody = ""
         if len(entries) != 0:
             entrybody = entrybody_t.substitute(entries=entries)
+        day = d[0].strftime("%a").lower()
         body += entryblock_t.substitute(
             date = d[0].strftime("%A, %d/%m/%Y"),
             isodate = d[0].strftime("%Y%m%d"),
-            type="day " + d[0].strftime("%a").lower(),
+            type="org-heading " +
+            ("org-heading--weekend" if day  in ["sat", "sun"]
+             else "org-heading--weekday"),
             entry_body=entrybody)
+        if day in ["sun", "fri"]:
+            body += "<hr class='org-weekseparator'/>"
     return main_t.substitute(body=body)
