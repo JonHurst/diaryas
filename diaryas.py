@@ -115,7 +115,8 @@ if __name__ == "__main__":
         if (diary == [ ] or diary_changed or (startdate < diary[0][0]) or (enddate > diary[-1][0])):
             diary = get_diary(startdate, enddate + datetime.timedelta(days=7)) #extra 7 days for sport
         if args.out_format == "html":
-            if args.start_tomorrow: startdate += datetime.timedelta(days=1)
+            startdate -= datetime.timedelta(days=startdate.weekday())
+            enddate = startdate + datetime.timedelta(days=55)
             print(build_html.build_html(diary, startdate, enddate))
         elif args.out_format == "htmlyearplan":
             print(build_htmlyearplan.build_html_yearplan(diary, startdate, enddate))
