@@ -3,7 +3,8 @@ import re
 import html
 
 main_t = string.Template("""\
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
 <title>Diary</title>
 <meta charset="UTF-8"/>
