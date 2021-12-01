@@ -2,17 +2,19 @@ import string
 import html
 
 main_yearplan_t = string.Template("""\
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
 <head>
 <title>Year planner</title>
-<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
-<link rel="stylesheet" type="text/css" href="styles.css"/>
+<meta charset="UTF-8"/>
+<link rel="stylesheet" type="text/css" href="common.css"/>
+<link rel="stylesheet" type="text/css" href="yearplan.css"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link rel="icon" type='image/png' href="https://hursts.org.uk/favicon.png"/>
+<script src="yearplan.js"></script>
 </head>
-<body id='yearplan'>
-<div class="page">
+<body>
+<div class="org-yearplan">
 $monthsets
 </div>
 </body>
@@ -24,11 +26,15 @@ $monthset
 """)
 
 month_t = string.Template("""\
-<div class="month">
-<table>
-<colgroup><col class="date"/><col class="dayoff" span="3" /><col class="description"/></colgroup>
+<div class="org-month-container">
+<table class="org-month-table">
+<colgroup>
+<col class="org-month-table__datecol"/>
+<col class="org-month-table__flagcols" span="3" />
+<col class="org-month-table__descriptioncol"/>
+</colgroup>
 <thead>
-<tr><th colspan="5">$month_name</th></tr>
+<tr class="org-month-table__header"><th colspan="5">$month_name</th></tr>
 </thead>
 <tbody>
 $rows
@@ -38,7 +44,11 @@ $rows
 """)
 
 row_t = string.Template("""\
-<tr class="$we"><td class="date">$day</td><td class='$jon'></td><td class='$kids'></td><td class='$nscd'></td><td>$entry</td></tr>\
+<tr class="org-month-table__day $we">
+<td class="org-month-table__date">$day</td>
+<td class='$jon'></td><td class='$kids'></td>
+<td class='$nscd'></td><td>$entry</td>
+</tr>\
 """)
 
 
@@ -50,12 +60,12 @@ def build_html_yearplan(diary, startdate, enddate):
         month_id = d[0].replace(day=1) #use first day of month as identifier
         if month_id not in months: months[month_id] = []
         weekend, jon, kids, nscd, entry = ("",) * 5
-        if d[0].weekday() >= 5: weekend = "we"
+        if d[0].weekday() >= 5: weekend = "org-month-table__day--weekend"
         for e in d[2:]:
             e = html.escape(e)
-            if e == "*NTU*": kids = "kids"
-            elif e == "*Working*": jon = "jon"
-            elif e == "*NSCD*": nscd = "nscd"
+            if e == "*NTU*": kids = "org-month-table__entry--em"
+            elif e == "*Working*": jon = "org-month-table__entry--jon"
+            elif e == "*NSCD*": nscd = "org-month-table__entry--isla"
             elif (e[0] == "*" and e[-1] == "*"): entry = e[1:-1]
         months[month_id].append(
             row_t.substitute(we=weekend,
