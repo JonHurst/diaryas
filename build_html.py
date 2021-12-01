@@ -17,8 +17,8 @@ main_t = string.Template("""\
 </head>
 
 <body>
-<div class="org-page">
-<h1 class="org-heading org-heading--title">Diary</h1>
+<!--h1 class="org-heading org-heading--title">Diary</h1-->
+<div class="org-diarypage">
 $body
 </div>
 </body>
@@ -53,7 +53,7 @@ def process_strikethrough(s):
 
 
 def build_html(diary, startdate, enddate):
-    body = ""
+    body = "<div class='org-week'>"
     reo_entry = re.compile(r"([\d:]{5}(?:-[\d:]{5})?(?:\s\[\w+\])?)\s*(.+)\Z", re.DOTALL)
     for d in diary:
         if d[0] < startdate: continue
@@ -99,6 +99,7 @@ def build_html(diary, startdate, enddate):
             ("org-heading--weekend" if day  in ["sat", "sun"]
              else "org-heading--weekday"),
             entry_body=entrybody)
-        if day in ["sun", "fri"]:
-            body += "<hr class='org-weekseparator'/>"
+        if day == "sun":
+            body += "</div><div class='org-week'>"
+    body = body[:-len("<div class='org-week'>")]
     return main_t.substitute(body=body)
