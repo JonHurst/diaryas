@@ -69,6 +69,7 @@ def build_html(diary, startdate, enddate):
                 type="org-eventlist__event--holiday",
                 description=html.escape(e))
         if d[2]:  # there are tags
+            d[2].sort(key=lambda a: a not in tags)
             html_tags = [
                 f"<div class=\"{tags.get(X, 'org-tags__default')}\">{X}</div>"
                 for X in d[2]]
