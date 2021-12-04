@@ -15,7 +15,8 @@ import build_latexyearplan
 
 def get_diary(startdate, enddate):
     """
-    Returns the diary in the form ((DATE, (HOLIDAY, ...), TEXT, TEXT, ...), ...
+    Returns the diary in the form
+     ((DATE, (HOLIDAY, ...), (TAG, ...), TEXT, TEXT, ...), ...
     """
     tf = tempfile.NamedTemporaryFile()
     FNULL = open(os.devnull, 'w')
@@ -28,46 +29,47 @@ def get_diary(startdate, enddate):
         ],
         stdout=FNULL, stderr=subprocess.STDOUT)
     retval = []
-    current = None
+    current = ["dummy", [], []]
     reo_date = re.compile(r"((?:Saturday|Sunday|Monday|Tuesday|Wednesday|"
                           r"Thursday|Friday)[^:]*)[:\s]*(.*)")
     reo_underline = re.compile(r"^=+$")
     in_header = False
-    for line in tf.readlines():
+    last_blank = -1
+    for count, line in enumerate(tf.readlines()):
         line = line.decode().rstrip()
-        mo = reo_date.match(line)
-        if mo:
+        if len(line) == 0:  # Line was empty or only whitespace
+            last_blank = count
+        elif line[0] == "#":  # Line is a tag
+            current[2].append(line[1:])
+        elif line[0].isspace():  # Line is a continuation
+            line = "\n" + line.lstrip()
+            if in_header:
+                current[1][-1] += line
+            else:
+                current[-1] += line
+        elif mo := reo_date.match(line):  # Line was a date header
+            if last_blank != count - 1:
+                raise ValueError("Bad header format.")
             in_header = True
             retval.append(current)
-            current = [mo.group(1), []]
-            if mo.group(2):
+            current = [mo.group(1), [], []]
+            if mo.group(2):  # ...and had a holiday attached
                 current[1].append(mo.group(2))
-            continue
-        mo = reo_underline.match(line)
-        if mo:
+        elif reo_underline.match(line):  # Line is ====, ending the header
             in_header = False
-            continue
-        if len(line):
-            if line[0].isspace():
-                line = "\n" + line.lstrip()
-                if in_header:
-                    current[1][-1] += line
-                else:
-                    current[-1] += line
-            else:
-                if in_header:
-                    current[1].append(line)
-                else:
-                    current.append(line)
+        else:
+            if in_header:  # It's an additional holiday entry
+                current[1].append(line)
+            else:  # Line is a normal diary entry
+                current.append(line)
     retval.append(current)
-    del retval[0]  # remove None that is appended as first entry
+    del retval[0]  # remove dummy that is appended as first entry
     # replace string date with datetime object
     reo_date = re.compile(r"(\d+)/(\d+)/(\d+)")
     for c, r in enumerate(retval):
         mo = reo_date.search(r[0])
         args = [int(X) for X in reversed(mo.groups())]
         retval[c][0] = datetime.date(*args)
-    # sys.stderr.write(str(retval)) #for debug - dump diary
     return retval
 
 
@@ -115,5 +117,10 @@ if __name__ == "__main__":
         print(build_latex.build_latex(
             get_diary(startdate, enddate),
             startdate, enddate, args.card))
+    elif args.out_format == "debug":
+        startdate = datetime.date.today()
+        enddate = startdate + datetime.timedelta(days=55)
+        for entry in get_diary(startdate, enddate):
+            print(entry)
     else:
         print(args.out_format, " is not supported yet.")

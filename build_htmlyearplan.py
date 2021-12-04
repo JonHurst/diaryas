@@ -1,6 +1,8 @@
 import string
 import html
 
+flagged_tags = ("Working", "NTU")
+
 main_yearplan_t = string.Template("""\
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
@@ -15,14 +17,10 @@ main_yearplan_t = string.Template("""\
 </head>
 <body>
 <div class="org-yearplan">
-$monthsets
+$months_str
 </div>
 </body>
 </html>
-""")
-
-monthset_t = string.Template("""\
-$monthset
 """)
 
 month_t = string.Template("""\
@@ -46,8 +44,8 @@ $rows
 row_t = string.Template("""\
 <tr class="org-month-table__day $we">
 <td class="org-month-table__date">$day</td>
-<td class='$jon'></td><td class='$kids'></td>
-<td class='$nscd'></td><td>$entry</td>
+<td class='$tag1'></td><td class='$tag2'></td>
+<td class='$tag3'></td><td class='org-month-table__defaultentry'>$entry</td>
 </tr>\
 """)
 
@@ -55,32 +53,31 @@ row_t = string.Template("""\
 def build_html_yearplan(diary, startdate, enddate):
     months = {}
     for d in diary:
-        if d[0] < startdate: continue
-        if d[0] > enddate: break
-        month_id = d[0].replace(day=1) #use first day of month as identifier
-        if month_id not in months: months[month_id] = []
-        weekend, jon, kids, nscd, entry = ("",) * 5
-        if d[0].weekday() >= 5: weekend = "org-month-table__day--weekend"
-        for e in d[2:]:
-            e = html.escape(e)
-            if e == "*NTU*": kids = "org-month-table__entry--em"
-            elif e == "*Working*": jon = "org-month-table__entry--jon"
-            elif e == "*NSCD*": nscd = "org-month-table__entry--isla"
-            elif (e[0] == "*" and e[-1] == "*"): entry = e[1:-1]
-        months[month_id].append(
-            row_t.substitute(we=weekend,
-                             day=d[0].day,
-                             jon=jon,
-                             kids=kids,
-                             nscd=nscd,
-                             entry=entry))
-    skeys = list(months.keys()); skeys.sort()
-    monthset_keys = [skeys[i:i + 3] for i in range(0, len(skeys), 3)]
-    monthsets = ""
-    for ms in monthset_keys:
-        monthstr = ""
-        for m in ms:
-            monthstr += month_t.substitute(month_name=m.strftime("%B %Y"),
-                                           rows="\n".join(months[m]))
-        monthsets += monthset_t.substitute(monthset=monthstr)
-    return main_yearplan_t.substitute(monthsets=monthsets)
+        if d[0] < startdate:
+            continue
+        if d[0] > enddate:
+            break
+        month_id = d[0].replace(day=1)  # use first day of month as identifier
+        if month_id not in months:
+            months[month_id] = []
+        subs = {
+            "we": ("org-month-table__day--weekend"
+                   if d[0].weekday() >= 5 else ""),
+            "day": d[0].day,
+            "tag1": "", "tag2": "", "tag3": ""
+        }
+        entries = []
+        for e in d[2]:
+            if e in flagged_tags:
+                index = flagged_tags.index(e) + 1
+                subs[f"tag{index}"] = f"org-month-table__tag{index}"
+            else:
+                entries.append(html.escape(e))
+        subs["entry"] = "; ".join(entries)
+        months[month_id].append(row_t.substitute(**subs))
+    months_str = ""
+    for k in sorted(months.keys()):
+        months_str += month_t.substitute(
+            month_name=k.strftime("%B %Y"),
+            rows="\n".join(months[k]))
+    return main_yearplan_t.substitute(months_str=months_str)

@@ -2,8 +2,8 @@ import string
 import re
 import latex_escape
 
-a4diary_t = string.Template(
-r"""\documentclass{article}
+a4diary_t = string.Template(r"""
+\documentclass{article}
 \pagestyle{empty}
 
 \usepackage{fontspec}
@@ -37,8 +37,8 @@ $body
 \end{document}
 """)
 
-carddiary_t = string.Template(
-r"""\documentclass{article}
+carddiary_t = string.Template(r"""
+\documentclass{article}
 \pagestyle{empty}
 \usepackage[utf8]{inputenc}
 \usepackage[dvipsnames]{xcolor}
@@ -64,29 +64,30 @@ $body
 \end{document}
 """)
 
-diaryday_t = string.Template(
-r"""\diaryday{\textcolor{$color}{$date}}{
+diaryday_t = string.Template(r"""
+\diaryday{\textcolor{$color}{$date}}{
 $events}
 
 """)
 
-holiday_event_t = string.Template(
-r"""\event{\textit{$e}}
+holiday_event_t = string.Template(r"""
+\event{\textit{$e}}
 """)
 
-std_event_t = string.Template(
-r"""\event{$$\bullet$$ $e}
+std_event_t = string.Template(r"""
+\event{$$\bullet$$ $e}
 """)
 
-timed_event_t = string.Template(
-r"""\timedevent{$timestring}{$description}
+timed_event_t = string.Template(r"""
+\timedevent{$timestring}{$description}
 """)
 
-school_t = r"\fcolorbox{black}{green}{\strut NTU}"
-working_t = r"\fcolorbox{black}{red}{\strut Working}"
+tag1_t = string.Template(r"\fcolorbox{black}{red}{\strut $contents}")
+tag2_t = string.Template(r"\fcolorbox{black}{green}{\strut $contents}")
+tag3_t = string.Template(r"\fcolorbox{black}{SkyBlue}{\strut $contents}")
+gentag_t = string.Template(r"\fcolorbox{black}{white}{\strut $contents}")
 notworking_t = r"\fcolorbox{black}{white}{\strut Not Working}"
-nscd_t = r"\fcolorbox{black}{SkyBlue}{\strut NSCD}"
-flags_t = string.Template("\\event{$working $school $nscd}\n")
+flags_t = string.Template("\\event{$flags}\n")
 
 
 def process_strikethrough(s):
@@ -97,41 +98,41 @@ def process_strikethrough(s):
 
 def build_latex(diary, startdate, enddate, card=False):
     body = ""
-    reo_entry = re.compile(r"([\d:]{5}(?:-[\d:]{5})?(?:\s\[\w+\])?)\s*(.+)\Z", re.DOTALL)
+    reo_entry = re.compile(
+        r"([\d:]{5}(?:-[\d:]{5})?(?:\s\[\w+\])?)\s*(.+)\Z",
+        re.DOTALL)
     for d in diary:
-        if d[0] < startdate: continue
-        if d[0] > enddate: break
+        if d[0] < startdate:
+            continue
+        if d[0] > enddate:
+            break
         holidays = []
-        for e in d[1]: #holidays
+        for e in d[1]:  # holidays
             e = latex_escape.escape(e)
             holidays.append(holiday_event_t.substitute(e=e))
-        school_p, working_p, nscd_p = False, False, False
         events = []
-        for e in d[2:]:
+        for e in d[3:]:
             e = latex_escape.escape(e)
-            if e == "*NTU*": school_p = True
-            elif e == "*Working*": working_p = True
-            elif e == "*NSCD*": nscd_p = True
-            elif (e[0] == "*" and e[-1] == "*"):
-                events.append(std_event_t.substitute(e="\\textbf{" + e[1:-1] + "}"))
+            mo = reo_entry.match(e)
+            if mo:
+                ts = mo.group(1)
+                de = mo.group(2)
+                de = de.replace("\n", r"\\\hspace{1em}")
+                de = process_strikethrough(de)
+                events.append(timed_event_t.substitute(timestring=ts,
+                                                       description=de))
             else:
-                mo = reo_entry.match(e)
-                if mo:
-                    ts = mo.group(1)
-                    de = mo.group(2)
-                    de = de.replace("\n", r"\\\hspace{1em}")
-                    de = process_strikethrough(de)
-                    events.append(timed_event_t.substitute(timestring=ts,
-                                                           description=de))
-                else:
-                    e = process_strikethrough(e)
-                    events.append(std_event_t.substitute(e=e))
-        flags = flags_t.substitute(working=working_t if working_p else notworking_t,
-                                   school=school_t if school_p else "",
-                                   nscd=nscd_t if nscd_p else "")
+                e = process_strikethrough(e)
+                events.append(std_event_t.substitute(e=e))
+        flag_lookup = {"Working": tag1_t, "NTU": tag2_t}
+        flags = [flag_lookup.get(X, gentag_t).substitute(contents=X)
+                 for X in d[2]]
+        if "Working" not in d[2]:
+            flags.append(notworking_t)
+        flag_str = flags_t.substitute(flags=" ".join(flags))
         body += diaryday_t.substitute(
             color="black",
             date=d[0].strftime("%A, %d/%m/%Y"),
-            events = "".join(holidays) + flags + "".join(events))
+            events="".join(holidays) + flag_str + "".join(events))
     main_t = carddiary_t if card else a4diary_t
     return main_t.substitute(body=body)
