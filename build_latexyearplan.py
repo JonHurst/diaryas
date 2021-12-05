@@ -1,8 +1,8 @@
 import string
 import latex_escape
 
-a4_yearplan_t = string.Template(
-r"""\documentclass{article}
+a4_yearplan_t = string.Template(r"""
+\documentclass{article}
 \pagestyle{empty}
 
 \usepackage{fontspec}
@@ -51,8 +51,8 @@ $months_bot
 """)
 
 
-card_yearplan_t = string.Template(
-r"""\documentclass{article}
+card_yearplan_t = string.Template(r"""
+\documentclass{article}
 \pagestyle{empty}
 \usepackage[utf8]{inputenc}
 \usepackage{colortbl}
@@ -88,8 +88,8 @@ $body
 \end{document}
 """)
 
-monthtable_t = string.Template(
-r"""\begin{monthtable}{$month_name}
+monthtable_t = string.Template(r"""
+\begin{monthtable}{$month_name}
 $month_entries
 \end{monthtable}
 """)
@@ -99,44 +99,51 @@ $month_entries
 # r"""\hfill$month_left\hfill$month_right\hspace*{\fill}
 # """)
 
-card_body_t = string.Template(
-r"""$month_left\hfill$month_right
+card_body_t = string.Template(r"""
+$month_left\hfill$month_right
 """)
-
 
 
 def build(diary, startdate, enddate, card=False):
     months = {}
     for d in diary:
-        if d[0] < startdate: continue
-        if d[0] > enddate: break
-        month_id = d[0].replace(day=1) #use first day of month as identifier
-        if month_id not in months: months[month_id] = []
+        if d[0] < startdate:
+            continue
+        if d[0] > enddate:
+            break
+        month_id = d[0].replace(day=1)  # use first day of month as identifier
+        if month_id not in months:
+            months[month_id] = []
         jon, kids, nscd, entry = ("{}",) * 4
         day = r"\dentry{" + str(d[0].day) + "}"
         if d[0].weekday() >= 5:
             day = r"\we" + day
-        for e in d[2:]:
+        for e in d[2]:
             e = latex_escape.escape(e)
-            if e == "*NTU*": kids = "\kschool"
-            elif e == "*Working*": jon = r"\jwork"
-            elif e == "*NSCD*": nscd = r"\nscd"
-            elif (e[0] == "*" and e[-1] == "*"):
-                entry = "{" + e[1:-1] + "}"
+            if e == "NTU":
+                kids = r"\kschool"
+            elif e == "Working":
+                jon = r"\jwork"
+            elif e == "NSCD":
+                nscd = r"\nscd"
+            else:
+                entry = "{" + e + "}"
         months[month_id].append(day + jon + kids + nscd + entry)
     for k in months.keys():
         months[k] = monthtable_t.substitute(month_name=k.strftime("%B %Y"),
                                             month_entries="\n".join(months[k]))
-    monthkeys = list(months.keys()); monthkeys.sort()
+    monthkeys = list(months.keys())
+    monthkeys.sort()
     if card:
         cards = []
         for c in range(0, 12, 2):
-            cards.append(card_body_t.substitute(month_left=months[monthkeys[c]],
-                                                month_right=months[monthkeys[c + 1]]))
+            cards.append(card_body_t.substitute(
+                month_left=months[monthkeys[c]],
+                month_right=months[monthkeys[c + 1]]))
         return card_yearplan_t.substitute(
             body="\\pagebreak\n".join(cards))
     else:
-        months_top = "\hfill".join([months[k] for k in monthkeys[:6]])
-        months_bot = "\hfill".join([months[k] for k in monthkeys[6:]])
+        months_top = r"\hfill".join([months[k] for k in monthkeys[:6]])
+        months_bot = r"\hfill".join([months[k] for k in monthkeys[6:]])
         return a4_yearplan_t.substitute(months_top=months_top,
                                         months_bot=months_bot)

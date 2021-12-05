@@ -88,8 +88,7 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == "__main__":
-    args = parse_args()
+def main(args):
     if args.out_format == "htmlyearplan":
         startdate = datetime.date.today().replace(day=1)
         enddate = (startdate.replace(year=startdate.year + 1)
@@ -101,7 +100,7 @@ if __name__ == "__main__":
         enddate = (startdate.replace(year=startdate.year + 1)
                    - datetime.timedelta(days=1))
         print(build_latexyearplan.build(
-            get_diary(startdate, enddate), startdate, enddate))
+            get_diary(startdate, enddate), startdate, enddate, args.card))
     elif args.out_format == "html":
         startdate = datetime.date.today()
         startdate -= datetime.timedelta(days=startdate.weekday() + 7)
@@ -124,3 +123,7 @@ if __name__ == "__main__":
             print(entry)
     else:
         print(args.out_format, " is not supported yet.")
+
+
+if __name__ == "__main__":
+    main(parse_args())
