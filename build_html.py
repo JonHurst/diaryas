@@ -108,8 +108,8 @@ def build_html(diary, startdate, enddate):
             date=d[0].strftime("%A, %d/%m/%Y"),
             isodate=d[0].strftime("%Y%m%d"),
             type=("org-heading "
-                  + "org-heading--weekend" if day in ["sat", "sun"]
-                  else "org-heading--weekday"),
+                  + ("org-heading--weekend" if day in ["sat", "sun"]
+                     else "org-heading--weekday")),
             entry_body=entrybody)
         if day == "sun":
             body += "</div><div class='org-week'>"
