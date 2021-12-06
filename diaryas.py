@@ -13,10 +13,51 @@ import build_latex
 import build_latexyearplan
 
 
+def parse_fancy_diary(str_):
+    retval = []
+    reo_date = re.compile(r"(\d{1,2})/(\d{1,2})/(\d{4})")
+    # split string on empty lines to get a list of strings representing days
+    days = re.split(r"\n[ \t]*\n", str_)
+    for day in days:
+        current_day = []
+        # split into header and body (body may be empty)
+        split = re.split(r"\n={5,}\n", day, 1)
+        # split header into lines
+        header_lines = [X.rstrip() for X in split[0].splitlines()]
+        # first header line may contain a colon in which case there
+        # is a holiday to the right of the colon. Any further header
+        # lines will be additional holidays
+        fields = header_lines[0].split(':')
+        mo = reo_date.search(fields[0])
+        if not mo:
+            raise ValueError("Bad day header.")
+        args = [int(X) for X in reversed(mo.groups())]
+        current_day.append(datetime.date(*args))
+        # append empty list for holidays
+        current_day.append([])
+        if len(fields) == 2:
+            current_day[-1].append(fields[1].strip())
+            for holiday in [X.strip() for X in header_lines[1:]]:
+                current_day[-1].append(holiday)
+        # append empty list to contain tags
+        current_day.append([])
+        # process the body if it exists
+        if len(split) == 2:
+            for line in [X.rstrip() for X in split[1].splitlines()]:
+                if line[0] == '#':  # line is a tag
+                    current_day[2].append(line[1:])
+                elif line[0].isspace():  # line is a continuation
+                    current_day[-1] += "\n" + line.lstrip()
+                else:  # it's a normal diary entry
+                    current_day.append(line)
+        retval.append(current_day)
+    return retval
+
+
 def get_diary(startdate, enddate):
     """
     Returns the diary in the form
-     ((DATE, (HOLIDAY, ...), (TAG, ...), TEXT, TEXT, ...), ...
+     [[DATE, [HOLIDAY, ...], [TAG, ...], TEXT, TEXT, ...], ...
     """
     tf = tempfile.NamedTemporaryFile()
     FNULL = open(os.devnull, 'w')
@@ -28,49 +69,7 @@ def get_diary(startdate, enddate):
                (enddate - startdate).days + 1, tf.name)
         ],
         stdout=FNULL, stderr=subprocess.STDOUT)
-    retval = []
-    current = ["dummy", [], []]
-    reo_date = re.compile(r"((?:Saturday|Sunday|Monday|Tuesday|Wednesday|"
-                          r"Thursday|Friday)[^:]*)[:\s]*(.*)")
-    reo_underline = re.compile(r"^=+$")
-    in_header = False
-    last_blank = -1
-    for count, line in enumerate(tf.readlines()):
-        line = line.decode().rstrip()
-        if len(line) == 0:  # Line was empty or only whitespace
-            last_blank = count
-        elif line[0] == "#":  # Line is a tag
-            current[2].append(line[1:])
-        elif line[0].isspace():  # Line is a continuation
-            line = "\n" + line.lstrip()
-            if in_header:
-                current[1][-1] += line
-            else:
-                current[-1] += line
-        elif mo := reo_date.match(line):  # Line was a date header
-            if last_blank != count - 1:
-                raise ValueError("Bad header format.")
-            in_header = True
-            retval.append(current)
-            current = [mo.group(1), [], []]
-            if mo.group(2):  # ...and had a holiday attached
-                current[1].append(mo.group(2))
-        elif reo_underline.match(line):  # Line is ====, ending the header
-            in_header = False
-        else:
-            if in_header:  # It's an additional holiday entry
-                current[1].append(line)
-            else:  # Line is a normal diary entry
-                current.append(line)
-    retval.append(current)
-    del retval[0]  # remove dummy that is appended as first entry
-    # replace string date with datetime object
-    reo_date = re.compile(r"(\d+)/(\d+)/(\d+)")
-    for c, r in enumerate(retval):
-        mo = reo_date.search(r[0])
-        args = [int(X) for X in reversed(mo.groups())]
-        retval[c][0] = datetime.date(*args)
-    return retval
+    return parse_fancy_diary(tf.read().decode())
 
 
 def parse_args():
