@@ -61,7 +61,7 @@ def modifier_from_tag(tag):
 
 
 def build_html(diary, startdate, enddate):
-    body = "<div class='org-week'>"
+    body = "<div class='org-week'>\n"
     reo_entry = re.compile(
         r"([\d:]{5}(?:-[\d:]{5})?(?:\s\[\w+\])?)\s*(.+)\Z",
         re.DOTALL)
@@ -111,6 +111,6 @@ def build_html(diary, startdate, enddate):
                      else "org-heading--weekday")),
             entry_body=entrybody)
         if day == "sun":
-            body += "</div><div class='org-week'>"
-    body = body[:-len("<div class='org-week'>")]
+            body += "</div><div class='org-week'>\n"
+    body = body[:-len("<div class='org-week'>\n")]
     return main_t.substitute(body=body)
