@@ -20,7 +20,6 @@ main_t = string.Template("""\
 </head>
 
 <body>
-<!--h1 class="org-heading org-heading--title">Diary</h1-->
 <div class="org-diarypage">
 $body
 </div>
