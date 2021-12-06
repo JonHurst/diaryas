@@ -3,7 +3,8 @@ import re
 import html
 
 
-tags = {"Working": "org-tags__tag1", "NTU": "org-tags__tag2"}
+special_tags = ("Working", "NTU")
+
 
 main_t = string.Template("""\
 <!DOCTYPE html>
@@ -53,6 +54,13 @@ def process_strikethrough(s):
     return s
 
 
+def modifier_from_tag(tag):
+    try:
+        return f" org-tags__tag--{special_tags.index(tag) + 1}"
+    except ValueError:
+        return ""
+
+
 def build_html(diary, startdate, enddate):
     body = "<div class='org-week'>"
     reo_entry = re.compile(
@@ -69,11 +77,14 @@ def build_html(diary, startdate, enddate):
                 type="org-eventlist__event--holiday",
                 description=html.escape(e))
         if d[2]:  # there are tags
-            d[2].sort(key=lambda a: a not in tags)
+            d[2].sort(key=lambda a: a not in special_tags)
             html_tags = [
-                f"<div class=\"{tags.get(X, 'org-tags__default')}\">{X}</div>"
+                f"<div class=\"org-tags__tag{modifier_from_tag(X)}\">{X}</div>"
                 for X in d[2]]
-            entries += f"<li class=\"org-tags\">{''.join(html_tags)}</li>"
+            entries += (
+                '<li class="org-eventlist__taglist"><div class="org-tags">\n'
+                + '\n'.join(html_tags)
+                + "\n</div></li>\n")
         for e in d[3:]:
             e = html.escape(e)
             if mo := reo_entry.match(e):  # timed event
