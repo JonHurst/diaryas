@@ -54,7 +54,7 @@ def parse_fancy_diary(str_):
     return retval
 
 
-def get_diary(startdate, enddate):
+def get_diary(startdate, enddate, tags_only=False):
     """
     Returns the diary in the form
      [[DATE, [HOLIDAY, ...], [TAG, ...], TEXT, TEXT, ...], ...
@@ -64,9 +64,10 @@ def get_diary(startdate, enddate):
     subprocess.run(
         [
             "emacs", "--batch", "-Q", "-l", "~/.emacs-calendar.el",
-            "--eval", "(save-fancy-diary '(%d %d %d) %d \"%s\")"
+            "--eval", "(save-fancy-diary '(%d %d %d) %d \"%s\" %s)"
             % (startdate.month, startdate.day, startdate.year,
-               (enddate - startdate).days + 1, tf.name)
+               (enddate - startdate).days + 1, tf.name,
+               "'t" if tags_only else "nil")
         ],
         stdout=FNULL, stderr=subprocess.STDOUT)
     return parse_fancy_diary(tf.read().decode())
@@ -93,13 +94,13 @@ def main(args):
         enddate = (startdate.replace(year=startdate.year + 1)
                    - datetime.timedelta(days=1))
         print(build_htmlyearplan.build_html_yearplan(
-            get_diary(startdate, enddate), startdate, enddate))
+            get_diary(startdate, enddate, True), startdate, enddate))
     elif args.out_format == "latexyearplan":
         startdate = datetime.date.today().replace(day=1)
         enddate = (startdate.replace(year=startdate.year + 1)
                    - datetime.timedelta(days=1))
         print(build_latexyearplan.build(
-            get_diary(startdate, enddate), startdate, enddate, args.card))
+            get_diary(startdate, enddate, True), startdate, enddate, args.card))
     elif args.out_format == "html":
         startdate = datetime.date.today()
         startdate -= datetime.timedelta(days=startdate.weekday() + 7)
