@@ -21,7 +21,9 @@ def parse_fancy_diary(str_):
     for day in days:
         current_day = []
         # split into header and body (body may be empty)
-        split = re.split(r"\n={5,}\n", day, 1)
+        # note that splitting into days may have removed terminating new line
+        # if there is a holiday but no tags or entries.
+        split = re.split(r"\n={5,}\n?", day, 1)
         # split header into lines
         header_lines = [X.rstrip() for X in split[0].splitlines()]
         # first header line may contain a colon in which case there
