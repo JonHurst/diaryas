@@ -79,7 +79,9 @@ def build_html(diary: Tuple[DayRecord]) -> str:
             entry_type = (
                 "org-eventlist__event--timed"
                 if e.timestr else "org-eventlist__event--untimed")
-            text = process_strikethrough(html.escape(e.text))
+            text = html.escape(e.text)
+            text = text.replace("\n", " <br/>")
+            text = process_strikethrough(text)
             entries += (f"<li class='org-eventlist__event {entry_type}'>"
                         f"{timestr}{text}</li>\n")
         day = rec.date.strftime("%a").lower()
