@@ -1,6 +1,8 @@
 import string
-import re
 import html
+from typing import Tuple
+
+from diarytypes import DayRecord
 
 
 special_tags = ("Working", "NTU")
@@ -30,86 +32,64 @@ $body
 entryblock_t = string.Template("""\
 <div class="org-day" id='d$isodate'>
 <h2 class='$type'>$date</h2>
-$entry_body</div>
-""")
-
-entrybody_t = string.Template("""\
 <ul class='org-eventlist'>
-$entries</ul>
-""")
-
-timed_t = string.Template("""\
-<span class='org-time'>$timestring</span> $description
-""")
-
-entrystring_t = string.Template("""\
-<li class='org-eventlist__event $type'>$description</li>
+$entry_body
+</ul>
+</div>
 """)
 
 
-def process_strikethrough(s):
+def process_strikethrough(s: str) -> str:
     if s[:3] == "xxx" and s[-3:] == "xxx":
         s = "<del>" + s[3:-3] + "</del>"
     return s
 
 
-def modifier_from_tag(tag):
+def modifier_from_tag(tag: str) -> str:
     try:
         return f" org-tags__tag--{special_tags.index(tag) + 1}"
     except ValueError:
         return ""
 
 
-def build_html(diary, startdate, enddate):
+def build_html(diary: Tuple[DayRecord]) -> str:
     body = "<div class='org-week'>\n"
-    reo_entry = re.compile(
-        r"([\d:]{5}(?:-[\d:]{5})?(?:\s\[\w+\])?)\s*(.+)\Z",
-        re.DOTALL)
-    for d in diary:
-        if d[0] < startdate:
-            continue
-        if d[0] > enddate:
-            break
+    for rec in diary:
         entries = ""
-        for e in d[1]:
-            entries += entrystring_t.substitute(
-                type="org-eventlist__event--holiday",
-                description=html.escape(e))
-        if d[2]:  # there are tags
-            d[2].sort(key=lambda a: a not in special_tags)
+        for hol in rec.holidays:
+            entries += (
+                "<li class='org-eventlist__event "
+                + "org-eventlist__event--holiday'>"
+                + html.escape(hol)
+                + "</li>\n")
+        if rec.tags:
+            tags = [html.escape(X) for X in rec.tags]
+            tags.sort(key=lambda a: a not in special_tags)
             html_tags = [
                 f"<div class=\"org-tags__tag{modifier_from_tag(X)}\">{X}</div>"
-                for X in d[2]]
+                for X in tags]
             entries += (
                 '<li class="org-eventlist__taglist"><div class="org-tags">\n'
                 + '\n'.join(html_tags)
                 + "\n</div></li>\n")
-        for e in d[3:]:
-            e = html.escape(e)
-            if mo := reo_entry.match(e):  # timed event
-                des = mo.group(2).replace("\n", "<br/> ")
-                des = process_strikethrough(des)
-                e = timed_t.substitute(
-                    timestring=mo.group(1),
-                    description=des)
-                entry_type = "org-eventlist__event--timed"
-            else:
-                e = process_strikethrough(e)
-                entry_type = "org-eventlist__event--untimed"
-            entries += entrystring_t.substitute(
-                type=entry_type,
-                description=e)
-        entrybody = ""
-        if len(entries) != 0:
-            entrybody = entrybody_t.substitute(entries=entries)
-        day = d[0].strftime("%a").lower()
+        for e in rec.entries:
+            timestr = (
+                f"<span class='org-time'>{html.escape(e.timestr)}</span> "
+                if e.timestr else "")
+            entry_type = (
+                "org-eventlist__event--timed"
+                if e.timestr else "org-eventlist__event--untimed")
+            text = process_strikethrough(html.escape(e.text))
+            entries += (f"<li class='org-eventlist__event {entry_type}'>"
+                        f"{timestr}{text}</li>\n")
+        day = rec.date.strftime("%a").lower()
         body += entryblock_t.substitute(
-            date=d[0].strftime("%A, %d/%m/%Y"),
-            isodate=d[0].strftime("%Y%m%d"),
+            date=rec.date.strftime("%A, %d/%m/%Y"),
+            isodate=rec.date.strftime("%Y%m%d"),
             type=("org-heading "
                   + ("org-heading--weekend" if day in ["sat", "sun"]
                      else "org-heading--weekday")),
-            entry_body=entrybody)
+            entry_body=entries)
         if day == "sun":
             body += "</div><div class='org-week'>\n"
     body = body[:-len("<div class='org-week'>\n")]

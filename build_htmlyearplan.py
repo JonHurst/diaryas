@@ -50,24 +50,20 @@ row_t = string.Template("""\
 """)
 
 
-def build_html_yearplan(diary, startdate, enddate):
+def build_html_yearplan(diary):
     months = {}
     for d in diary:
-        if d[0] < startdate:
-            continue
-        if d[0] > enddate:
-            break
-        month_id = d[0].replace(day=1)  # use first day of month as identifier
+        month_id = d.date.replace(day=1)  # use first day of month as identifier
         if month_id not in months:
             months[month_id] = []
         subs = {
             "we": ("org-month-table__day--weekend"
-                   if d[0].weekday() >= 5 else ""),
-            "day": d[0].day,
+                   if d.date.weekday() >= 5 else ""),
+            "day": d.date.day,
             "tag1": "", "tag2": "", "tag3": ""
         }
         entries = []
-        for e in d[2]:
+        for e in d.tags:
             if e in flagged_tags:
                 index = flagged_tags.index(e) + 1
                 subs[f"tag{index}"] = f"org-month-table__tag{index}"

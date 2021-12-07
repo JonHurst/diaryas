@@ -32,4 +32,4 @@ def escape(str):
 if __name__ == "__main__":
     testcase = r"$trouble$%ahead#with{this}~^\statement<>"
     print(testcase)
-    print(latex_escape(testcase))
+    print(escape(testcase))

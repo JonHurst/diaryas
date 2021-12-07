@@ -104,21 +104,17 @@ $month_left\hfill$month_right
 """)
 
 
-def build(diary, startdate, enddate, card=False):
+def build(diary, card=False):
     months = {}
     for d in diary:
-        if d[0] < startdate:
-            continue
-        if d[0] > enddate:
-            break
-        month_id = d[0].replace(day=1)  # use first day of month as identifier
+        month_id = d.date.replace(day=1)  # use first day of month as identifier
         if month_id not in months:
             months[month_id] = []
         jon, kids, nscd, entry = ("{}",) * 4
-        day = r"\dentry{" + str(d[0].day) + "}"
-        if d[0].weekday() >= 5:
+        day = r"\dentry{" + str(d.date.day) + "}"
+        if d.date.weekday() >= 5:
             day = r"\we" + day
-        for e in d[2]:
+        for e in d.tags:
             e = latex_escape.escape(e)
             if e == "NTU":
                 kids = r"\kschool"

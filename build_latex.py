@@ -96,43 +96,33 @@ def process_strikethrough(s):
     return s
 
 
-def build_latex(diary, startdate, enddate, card=False):
+def build_latex(diary, card=False):
     body = ""
-    reo_entry = re.compile(
-        r"([\d:]{5}(?:-[\d:]{5})?(?:\s\[\w+\])?)\s*(.+)\Z",
-        re.DOTALL)
     for d in diary:
-        if d[0] < startdate:
-            continue
-        if d[0] > enddate:
-            break
         holidays = []
-        for e in d[1]:  # holidays
+        for e in d.holidays:  # holidays
             e = latex_escape.escape(e)
             holidays.append(holiday_event_t.substitute(e=e))
         events = []
-        for e in d[3:]:
-            e = latex_escape.escape(e)
-            mo = reo_entry.match(e)
-            if mo:
-                ts = mo.group(1)
-                de = mo.group(2)
-                de = de.replace("\n", r"\\\hspace{1em}")
-                de = process_strikethrough(de)
-                events.append(timed_event_t.substitute(timestring=ts,
-                                                       description=de))
+        for e in d.entries:
+            de = latex_escape.escape(e.text)
+            de = de.replace("\n", r"\\\hspace{1em}")
+            de = process_strikethrough(de)
+            if e.timestr:
+                ts = latex_escape.escape(e.timestr)
+                events.append(
+                    timed_event_t.substitute(timestring=ts, description=de))
             else:
-                e = process_strikethrough(e)
-                events.append(std_event_t.substitute(e=e))
+                events.append(std_event_t.substitute(e=de))
         flag_lookup = {"Working": tag1_t, "NTU": tag2_t}
         flags = [flag_lookup.get(X, gentag_t).substitute(contents=X)
-                 for X in d[2]]
-        if "Working" not in d[2]:
+                 for X in d.tags]
+        if "Working" not in d.tags:
             flags.append(notworking_t)
         flag_str = flags_t.substitute(flags=" ".join(flags))
         body += diaryday_t.substitute(
             color="black",
-            date=d[0].strftime("%A, %d/%m/%Y"),
+            date=d.date.strftime("%A, %d/%m/%Y"),
             events="".join(holidays) + flag_str + "".join(events))
     main_t = carddiary_t if card else a4diary_t
     return main_t.substitute(body=body)
