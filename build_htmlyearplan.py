@@ -1,7 +1,8 @@
 import string
 import html
 
-flagged_tags = ("Working", "NTU")
+from build_html import build_tags
+
 
 main_yearplan_t = string.Template("""\
 <!DOCTYPE html>
@@ -28,11 +29,10 @@ month_t = string.Template("""\
 <table class="org-month-table">
 <colgroup>
 <col class="org-month-table__datecol"/>
-<col class="org-month-table__flagcols" span="3" />
-<col class="org-month-table__descriptioncol"/>
+<col class="org-month-table__tagscol"/>
 </colgroup>
 <thead>
-<tr class="org-month-table__header"><th colspan="5">$month_name</th></tr>
+<tr><th class="org-month-table__header" colspan="2">$month_name</th></tr>
 </thead>
 <tbody>
 $rows
@@ -44,8 +44,7 @@ $rows
 row_t = string.Template("""\
 <tr class="org-month-table__day $we">
 <td class="org-month-table__date">$day</td>
-<td class='$tag1'></td><td class='$tag2'></td>
-<td class='$tag3'></td><td class='org-month-table__defaultentry'>$entry</td>
+<td class="org-month-table__tags">$tags</td>
 </tr>\
 """)
 
@@ -60,16 +59,8 @@ def build_html_yearplan(diary):
             "we": ("org-month-table__day--weekend"
                    if d.date.weekday() >= 5 else ""),
             "day": d.date.day,
-            "tag1": "", "tag2": "", "tag3": ""
+            "tags": "\n".join(build_tags(d.tags))
         }
-        entries = []
-        for e in d.tags:
-            if e in flagged_tags:
-                index = flagged_tags.index(e) + 1
-                subs[f"tag{index}"] = f"org-month-table__tag{index}"
-            else:
-                entries.append(html.escape(e))
-        subs["entry"] = "; ".join(entries)
         months[month_id].append(row_t.substitute(**subs))
     months_str = ""
     for k in sorted(months.keys()):
