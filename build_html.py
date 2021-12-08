@@ -51,6 +51,13 @@ def modifier_from_tag(tag: str) -> str:
         return ""
 
 
+def build_tags(taglist):
+    tags = [html.escape(X) for X in taglist]
+    tags.sort(key=lambda a: a not in special_tags)
+    return [f"<div class=\"org-tags__tag{modifier_from_tag(X)}\">{X}</div>"
+            for X in tags]
+
+
 def build_html(diary: Tuple[DayRecord]) -> str:
     body = "<div class='org-week'>\n"
     for rec in diary:
@@ -62,11 +69,7 @@ def build_html(diary: Tuple[DayRecord]) -> str:
                 + html.escape(hol)
                 + "</li>\n")
         if rec.tags:
-            tags = [html.escape(X) for X in rec.tags]
-            tags.sort(key=lambda a: a not in special_tags)
-            html_tags = [
-                f"<div class=\"org-tags__tag{modifier_from_tag(X)}\">{X}</div>"
-                for X in tags]
+            html_tags = build_tags(rec.tags)
             entries += (
                 '<li class="org-eventlist__taglist"><div class="org-tags">\n'
                 + '\n'.join(html_tags)
