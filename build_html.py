@@ -33,8 +33,7 @@ entryblock_t = string.Template("""\
 <div class="org-day" id='d$isodate'>
 <h2 class='$type'>$date</h2>
 <ul class='org-eventlist'>
-$entry_body
-</ul>
+$entry_body</ul>
 </div>
 """)
 
