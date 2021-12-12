@@ -16,6 +16,7 @@ a4diary_t = string.Template(r"""
 \usepackage{ulem}
 \usepackage[paper=a4paper,
 tmargin=0.75in, bmargin=1.5in, lmargin=0.25in, rmargin=0.25in]{geometry}
+\usepackage{tcolorbox}
 \setlength\parindent{0pt}
 
 \newcommand{\event}[1]{\vspace{1mm}\small #1\\}
@@ -30,6 +31,9 @@ tmargin=0.75in, bmargin=1.5in, lmargin=0.25in, rmargin=0.25in]{geometry}
 
 \vspace{1in plus 0.5in minus 0.1in}}
 
+\newcommand{\diarytag}[2]{%
+\tcbox[size=small,valign=center,nobeforeafter,colback=#1]{\strut #2}}
+
 \usepackage{multicol}
 \begin{document}
 \begin{multicols}{3}
@@ -43,6 +47,7 @@ carddiary_t = string.Template(r"""
 \pagestyle{empty}
 \usepackage[utf8]{inputenc}
 \usepackage[dvipsnames]{xcolor}
+\usepackage{tcolorbox}
 \usepackage{ulem}
 \usepackage[paperwidth=3in,paperheight=5in,
 tmargin=0.25in, bmargin=0.55in, lmargin=0.25in, rmargin=0.25in]{geometry}
@@ -58,7 +63,11 @@ tmargin=0.25in, bmargin=0.55in, lmargin=0.25in, rmargin=0.25in]{geometry}
   \vbox{\raggedright{\bf #1}\\
   #2}
 
-\vspace{3mm}}
+\vspace{0.5in plus 0.2in minus 0.1in}}
+%\vspace{3mm}}
+
+\newcommand{\diarytag}[2]{%
+\tcbox[size=small,valign=center,nobeforeafter,colback=#1]{\strut #2}}
 
 \begin{document}
 $body
@@ -68,27 +77,23 @@ $body
 diaryday_t = string.Template(r"""
 \diaryday{\textcolor{$color}{$date}}{
 $events}
-
 """)
 
 holiday_event_t = string.Template(r"""
-\event{\textit{$e}}
-""")
+\event{\textit{$e}}""")
 
 std_event_t = string.Template(r"""
-\event{$$\bullet$$ $e}
-""")
+\event{$$\bullet$$ $e}""")
 
 timed_event_t = string.Template(r"""
-\timedevent{$timestring}{$description}
-""")
+\timedevent{$timestring}{$description}""")
 
-tag1_t = string.Template(r"\fcolorbox{black}{red}{\strut $contents}")
-tag2_t = string.Template(r"\fcolorbox{black}{green}{\strut $contents}")
-tag3_t = string.Template(r"\fcolorbox{black}{SkyBlue}{\strut $contents}")
-gentag_t = string.Template(r"\fcolorbox{black}{white}{\strut $contents}")
-notworking_t = r"\fcolorbox{black}{white}{\strut Not Working}"
-flags_t = string.Template("\\event{$flags}\n")
+tag1_t = string.Template(r"\diarytag{red}{$contents}")
+tag2_t = string.Template(r"\diarytag{green}{$contents}")
+tag3_t = string.Template(r"\diarytag{blue}{$contents}")
+gentag_t = string.Template(r"\diarytag{white}{$contents}")
+notworking_t = r"\diarytag{white}{Not Working}"
+flags_t = string.Template(r"\event{$flags}")
 
 FLAG_LOOKUP = {"Working": tag1_t, "NTU": tag2_t}
 
