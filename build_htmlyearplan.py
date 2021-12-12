@@ -42,7 +42,7 @@ $rows
 """)
 
 row_t = string.Template("""\
-<tr class="org-month-table__day$we">
+<tr id="$isodate" class="org-month-table__day$we">
 <td class="org-month-table__date">$day</td>
 <td class="org-month-table__tags">$tags</td>
 </tr>\
@@ -56,6 +56,7 @@ def build_html_yearplan(diary):
         if month_id not in months:
             months[month_id] = []
         subs = {
+            "isodate": d.date.isoformat(),
             "we": (" org-month-table__day--weekend"
                    if d.date.weekday() >= 5 else ""),
             "day": d.date.day,
