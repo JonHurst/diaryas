@@ -2,6 +2,7 @@ import string
 import re
 import latex_escape
 
+
 a4diary_t = string.Template(r"""
 \documentclass{article}
 \pagestyle{empty}
@@ -89,6 +90,8 @@ gentag_t = string.Template(r"\fcolorbox{black}{white}{\strut $contents}")
 notworking_t = r"\fcolorbox{black}{white}{\strut Not Working}"
 flags_t = string.Template("\\event{$flags}\n")
 
+FLAG_LOOKUP = {"Working": tag1_t, "NTU": tag2_t}
+
 
 def process_strikethrough(s):
     if s[:3] == "xxx" and s[-3:] == "xxx":
@@ -114,8 +117,7 @@ def build_latex(diary, card=False):
                     timed_event_t.substitute(timestring=ts, description=de))
             else:
                 events.append(std_event_t.substitute(e=de))
-        flag_lookup = {"Working": tag1_t, "NTU": tag2_t}
-        flags = [flag_lookup.get(X, gentag_t).substitute(contents=X)
+        flags = [FLAG_LOOKUP.get(X, gentag_t).substitute(contents=X)
                  for X in d.tags]
         if "Working" not in d.tags:
             flags.append(notworking_t)
