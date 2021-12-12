@@ -5,15 +5,12 @@ a4_yearplan_t = string.Template(r"""
 \documentclass{article}
 \pagestyle{empty}
 
-\usepackage{fontspec}
-\newfontfamily{\symbolfont}{Symbola}
-\usepackage{ucharclasses}
-\setTransitionsForSymbols{\symbolfont}{}
-
 \usepackage{colortbl}
 \usepackage{array}
-\usepackage[paperwidth=210mm,paperheight=297mm,
-tmargin=1.5in, bmargin=.75in, lmargin=5mm, rmargin=5mm]{geometry}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[paperwidth=297mm,paperheight=210mm,
+tmargin=0.5in, bmargin=0.5in, lmargin=0.5in, rmargin=0.5in]{geometry}
+\usepackage{tcolorbox}
 
 \setlength{\tabcolsep}{0in}
 \setlength{\parindent}{0pt}
@@ -21,29 +18,29 @@ tmargin=1.5in, bmargin=.75in, lmargin=5mm, rmargin=5mm]{geometry}
 \newenvironment{monthtable}[1]{%
 \scriptsize
 \begin{tabular}[t]%
-{|>{\centering\hspace{0pt}}p{0.2in}%
-  |p{0.1in}%
-  |p{0.1in}%
-  |p{0.1in}%
-  |>{\raggedright\hspace{0pt}}p{0.65in}|}
+{|>{\centering}m{0.2in}|>{\raggedright}m{1.5in}|}
 \hline
-\multicolumn{5}{|c|}{#1}\tabularnewline\hline}
+\multicolumn{2}{|c|}{#1}\tabularnewline\hline}
 {\end{tabular}}
 
-\newcommand{\dentry}[5]{%
-#1&#2&#3&#4&#5\tabularnewline\hline}
+\newcommand{\dentry}[2]{%
+#1&#2\tabularnewline\hline}
 
-\newcommand{\jwork}{\cellcolor{red}}
-\newcommand{\kschool}{\cellcolor{green}}
-\newcommand{\nscd}{\cellcolor{cyan}}
+\newcommand{\diarytag}[2]{%
+\tcbox[colback=#1]{\strut #2}}
+
 \newcommand{\we}{\rowcolor[gray]{0.8}}
 
+\renewcommand{\arraystretch}{1.75}
+
 \begin{document}
+\tcbset{tcbox raise base,valign=center,nobeforeafter,
+boxrule=0.2mm,boxsep=0mm,left=0.5mm,right=0.5mm,top=0.75mm,bottom=0mm,middle=0mm,arc=0.5mm}
 \raggedright
 
 $months_top
 
-\vspace{10mm}
+\pagebreak
 
 $months_bot
 
@@ -51,57 +48,18 @@ $months_bot
 """)
 
 
-card_yearplan_t = string.Template(r"""
-\documentclass{article}
-\pagestyle{empty}
-\usepackage[utf8]{inputenc}
-\usepackage{colortbl}
-\usepackage{array}
-\usepackage[paperwidth=3in,paperheight=5in,
-tmargin=8mm, bmargin=15mm, lmargin=7mm, rmargin=7mm]{geometry}
-
-\setlength{\tabcolsep}{0in}
-\setlength{\parindent}{0pt}
-
-\newenvironment{monthtable}[1]{%
-\scriptsize
-\begin{tabular}[t]%
-{|>{\centering\hspace{0pt}}p{0.2in}%
-  |p{0.1in}%
-  |p{0.1in}%
-  |p{0.1in}%
-  |>{\raggedright\hspace{0pt}}p{0.65in}|}
-\hline
-\multicolumn{5}{|c|}{#1}\tabularnewline\hline}
-{\end{tabular}}
-
-\newcommand{\dentry}[5]{
-#1&#2&#3&#4&#5\tabularnewline\hline}
-
-\newcommand{\jwork}{\cellcolor{red}}
-\newcommand{\kschool}{\cellcolor{green}}
-\newcommand{\nscd}{\cellcolor{cyan}}
-\newcommand{\we}{\rowcolor[gray]{0.8}}
-
-\begin{document}
-$body
-\end{document}
-""")
-
 monthtable_t = string.Template(r"""
 \begin{monthtable}{$month_name}
 $month_entries
 \end{monthtable}
 """)
 
+tag1_t = string.Template(r"\diarytag{red}{$contents}")
+tag2_t = string.Template(r"\diarytag{green}{$contents}")
+tag3_t = string.Template(r"\diarytag{SkyBlue}{$contents}")
+gentag_t = string.Template(r"\diarytag{white}{$contents}")
 
-# card_body_t = string.Template(
-# r"""\hfill$month_left\hfill$month_right\hspace*{\fill}
-# """)
-
-card_body_t = string.Template(r"""
-$month_left\hfill$month_right
-""")
+FLAG_LOOKUP = {"Working": tag1_t, "NTU": tag2_t}
 
 
 def build(diary, card=False):
@@ -110,36 +68,23 @@ def build(diary, card=False):
         month_id = d.date.replace(day=1)  # use first day of month as identifier
         if month_id not in months:
             months[month_id] = []
-        jon, kids, nscd, entry = ("{}",) * 4
         day = r"\dentry{" + str(d.date.day) + "}"
         if d.date.weekday() >= 5:
             day = r"\we" + day
-        for e in d.tags:
+        taglist = []
+        for e in sorted(d.tags, key=lambda a: a not in FLAG_LOOKUP):
             e = latex_escape.escape(e)
-            if e == "NTU":
-                kids = r"\kschool"
-            elif e == "Working":
-                jon = r"\jwork"
-            elif e == "NSCD":
-                nscd = r"\nscd"
-            else:
-                entry = "{" + e + "}"
-        months[month_id].append(day + jon + kids + nscd + entry)
+            taglist.append(FLAG_LOOKUP.get(e, gentag_t).substitute(
+                contents=latex_escape.escape(e)))
+        months[month_id].append(day + "{\hspace{0.5mm}"
+                                + "\linebreak[0]\hspace*{0.5mm}".join(taglist)
+                                + "}")
     for k in months.keys():
         months[k] = monthtable_t.substitute(month_name=k.strftime("%B %Y"),
                                             month_entries="\n".join(months[k]))
     monthkeys = list(months.keys())
     monthkeys.sort()
-    if card:
-        cards = []
-        for c in range(0, 12, 2):
-            cards.append(card_body_t.substitute(
-                month_left=months[monthkeys[c]],
-                month_right=months[monthkeys[c + 1]]))
-        return card_yearplan_t.substitute(
-            body="\\pagebreak\n".join(cards))
-    else:
-        months_top = r"\hfill".join([months[k] for k in monthkeys[:6]])
-        months_bot = r"\hfill".join([months[k] for k in monthkeys[6:]])
-        return a4_yearplan_t.substitute(months_top=months_top,
-                                        months_bot=months_bot)
+    months_top = r"\hfill".join([months[k] for k in monthkeys[:6]])
+    months_bot = r"\hfill".join([months[k] for k in monthkeys[6:]])
+    return a4_yearplan_t.substitute(months_top=months_top,
+                                    months_bot=months_bot)
