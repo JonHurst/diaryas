@@ -74,7 +74,7 @@ def build(diary):
             taglist.append(FLAG_LOOKUP.get(e, gentag_t).substitute(
                 contents=latex_escape.escape(e)))
         months[month_id].append(
-            f"{we}\dentry{{{str(d.date.day)}}}{{{''.join(taglist)}}}")
+            f"{we}\\dentry{{{str(d.date.day)}}}{{{''.join(taglist)}}}")
     for k in months.keys():
         months[k] = monthtable_t.substitute(month_name=k.strftime("%B %Y"),
                                             month_entries="\n".join(months[k]))
