@@ -68,14 +68,13 @@ def build(diary, card=False):
         month_id = d.date.replace(day=1)  # use first day of month as identifier
         if month_id not in months:
             months[month_id] = []
-        day = r"\dentry{" + str(d.date.day) + "}"
-        if d.date.weekday() >= 5:
-            day = r"\we" + day
+        we = r"\we" if d.date.weekday() >= 5 else ""
         taglist = []
         for e in sorted(d.tags, key=lambda a: a not in FLAG_LOOKUP):
             taglist.append(FLAG_LOOKUP.get(e, gentag_t).substitute(
                 contents=latex_escape.escape(e)))
-        months[month_id].append(f"{day}{{{''.join(taglist)}}}")
+        months[month_id].append(
+            f"{we}\dentry{{{str(d.date.day)}}}{{{''.join(taglist)}}}")
     for k in months.keys():
         months[k] = monthtable_t.substitute(month_name=k.strftime("%B %Y"),
                                             month_entries="\n".join(months[k]))
