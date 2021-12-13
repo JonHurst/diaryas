@@ -27,7 +27,7 @@ tmargin=0.5in, bmargin=0.5in, lmargin=0.5in, rmargin=0.5in]{geometry}
 #1&#2\tabularnewline\hline}
 
 \newcommand{\diarytag}[2]{%
-\tcbox[colback=#1]{\strut #2}}
+\hspace*{0.5mm}\tcbox[colback=#1]{\strut #2}\linebreak[0]}
 
 \newcommand{\we}{\rowcolor[gray]{0.8}}
 
@@ -75,9 +75,7 @@ def build(diary, card=False):
         for e in sorted(d.tags, key=lambda a: a not in FLAG_LOOKUP):
             taglist.append(FLAG_LOOKUP.get(e, gentag_t).substitute(
                 contents=latex_escape.escape(e)))
-        months[month_id].append(day + "{\hspace{0.5mm}"
-                                + "\linebreak[0]\hspace*{0.5mm}".join(taglist)
-                                + "}")
+        months[month_id].append(f"{day}{{{''.join(taglist)}}}")
     for k in months.keys():
         months[k] = monthtable_t.substitute(month_name=k.strftime("%B %Y"),
                                             month_entries="\n".join(months[k]))
