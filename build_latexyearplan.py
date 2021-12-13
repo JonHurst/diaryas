@@ -78,8 +78,7 @@ def build(diary, card=False):
     for k in months.keys():
         months[k] = monthtable_t.substitute(month_name=k.strftime("%B %Y"),
                                             month_entries="\n".join(months[k]))
-    monthkeys = list(months.keys())
-    monthkeys.sort()
+    monthkeys = sorted(months.keys())
     months_top = r"\hfill".join([months[k] for k in monthkeys[:6]])
     months_bot = r"\hfill".join([months[k] for k in monthkeys[6:]])
     return a4_yearplan_t.substitute(months_top=months_top,
