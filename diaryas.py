@@ -103,7 +103,7 @@ def get_diary(
 
     :param startdate: First date of interest
     :param enddate: Last date of interest
-    :tags_only: Whether to only process tags (e.g. for yearplans)
+    :param tags_only: Whether to only process tags (e.g. for yearplans)
     :return: The fancy diary as a string.
     """
     tf = tempfile.NamedTemporaryFile()
