@@ -65,7 +65,7 @@ FLAG_LOOKUP = {"Working": tag1_t, "NTU": tag2_t}
 def build(diary):
     months = {}
     for d in diary:
-        month_id = d.date.replace(day=1)  # use first day of month as identifier
+        month_id = d.date.replace(day=1)  # use first day of month as key
         if month_id not in months:
             months[month_id] = []
         we = r"\we" if d.date.weekday() >= 5 else ""
