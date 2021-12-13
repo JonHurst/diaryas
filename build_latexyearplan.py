@@ -73,7 +73,6 @@ def build(diary, card=False):
             day = r"\we" + day
         taglist = []
         for e in sorted(d.tags, key=lambda a: a not in FLAG_LOOKUP):
-            e = latex_escape.escape(e)
             taglist.append(FLAG_LOOKUP.get(e, gentag_t).substitute(
                 contents=latex_escape.escape(e)))
         months[month_id].append(day + "{\hspace{0.5mm}"
