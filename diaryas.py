@@ -148,8 +148,7 @@ def main(args):
                    - datetime.timedelta(days=1))
         print(build_latexyearplan.build(
             parse_fancy_diary(
-                get_diary(startdate, enddate, True)),
-                args.card))
+                get_diary(startdate, enddate, True))))
     elif args.out_format == "html":
         startdate = datetime.date.today()
         startdate -= datetime.timedelta(days=startdate.weekday() + 7)

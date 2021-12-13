@@ -62,7 +62,7 @@ gentag_t = string.Template(r"\diarytag{white}{$contents}")
 FLAG_LOOKUP = {"Working": tag1_t, "NTU": tag2_t}
 
 
-def build(diary, card=False):
+def build(diary):
     months = {}
     for d in diary:
         month_id = d.date.replace(day=1)  # use first day of month as identifier
