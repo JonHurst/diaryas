@@ -7,13 +7,18 @@ a4_yearplan_t = string.Template(r"""
 
 \usepackage{colortbl}
 \usepackage{array}
-\usepackage[dvipsnames]{xcolor}
+% \usepackage[svgnames]{xcolor}
+\usepackage{color}
 \usepackage[paperwidth=297mm,paperheight=210mm,
 tmargin=0.5in, bmargin=0.5in, lmargin=0.5in, rmargin=0.5in]{geometry}
 \usepackage{tcolorbox}
 
 \setlength{\tabcolsep}{0in}
 \setlength{\parindent}{0pt}
+
+\definecolor{tag1col}{gray}{0.95}
+\definecolor{tag2col}{gray}{0.85}
+\definecolor{tag3col}{gray}{0.8}
 
 \newenvironment{monthtable}[1]{%
 \scriptsize
@@ -29,7 +34,7 @@ tmargin=0.5in, bmargin=0.5in, lmargin=0.5in, rmargin=0.5in]{geometry}
 \newcommand{\diarytag}[2]{%
 \hspace*{0.5mm}\tcbox[colback=#1]{\strut #2}\linebreak[0]}
 
-\newcommand{\we}{\rowcolor[gray]{0.8}}
+\newcommand{\we}{\rowcolor[gray]{0.9}}
 
 \renewcommand{\arraystretch}{1.75}
 
@@ -54,9 +59,11 @@ $month_entries
 \end{monthtable}
 """)
 
-tag1_t = string.Template(r"\diarytag{red}{$contents}")
-tag2_t = string.Template(r"\diarytag{green}{$contents}")
-tag3_t = string.Template(r"\diarytag{SkyBlue}{$contents}")
+
+
+tag1_t = string.Template(r"\diarytag{tag1col}{$contents}")
+tag2_t = string.Template(r"\diarytag{tag2col}{$contents}")
+tag3_t = string.Template(r"\diarytag{tag3col}{$contents}")
 gentag_t = string.Template(r"\diarytag{white}{$contents}")
 
 FLAG_LOOKUP = {"Working": tag1_t, "NTU": tag2_t}
