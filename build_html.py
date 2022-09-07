@@ -25,6 +25,7 @@ main_t = string.Template("""\
 <div class="org-diarypage">
 $body
 </div>
+<div id="refreshed"> - </div>
 </body>
 </html>
 """)
