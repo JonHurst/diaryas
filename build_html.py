@@ -17,7 +17,7 @@ main_t = string.Template("""\
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <link rel="stylesheet" type="text/css" href="common.css"/>
 <link rel="stylesheet" type="text/css" href="diary.css"/>
-<link rel="icon" type='image/png' href="https://hursts.org.uk/favicon.png"/>
+<link rel="icon" type='image/png' href="https://hursts.org.uk/images/diary.png"/>
 <script src="diary.js"></script>
 </head>
 

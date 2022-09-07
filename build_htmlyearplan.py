@@ -13,7 +13,7 @@ main_yearplan_t = string.Template("""\
 <link rel="stylesheet" type="text/css" href="common.css"/>
 <link rel="stylesheet" type="text/css" href="yearplan.css"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<link rel="icon" type='image/png' href="https://hursts.org.uk/favicon.png"/>
+<link rel="icon" type='image/png' href="https://hursts.org.uk/images/yearplanner.png"/>
 <script src="yearplan.js"></script>
 </head>
 <body>
